@@ -1,0 +1,111 @@
+
+---Downloaded files---
+The import files for: FULL DEMO 01 were successfully downloaded!
+Initial max execution time = 120
+Files info:
+Site URL = http://localhost/homey-2-1
+Data file = D:\xampp\htdocs\homey-2-1\wp-content\plugins\homey-core/demos/homey01/content.xml
+Widget file = D:\xampp\htdocs\homey-2-1\wp-content\plugins\homey-core/demos/homey01/widgets.json
+Customizer file = not defined!
+Redux files:
+homey_options -> D:\xampp\htdocs\homey-2-1\wp-content\plugins\homey-core/demos/homey01/redux.json 
+
+
+---ocdi/before_content_import---
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
+
+------
+New AJAX call!
+
