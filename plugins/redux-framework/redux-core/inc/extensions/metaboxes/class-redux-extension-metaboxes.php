@@ -162,6 +162,13 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 		public $wp_links = array();
 
 		/**
+		 * Notices.
+		 *
+		 * @var array
+		 */
+		private $notices = array();
+
+		/**
 		 * ReduxFramework_extension_metaboxes constructor.
 		 *
 		 * @param object $parent ReduxFramework object.
@@ -169,14 +176,14 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 		public function __construct( $parent ) {
 			global $pagenow;
 
+			parent::__construct( $parent, __FILE__ );
+
 			$this->parent = $parent;
 
 			$this->parent->extensions['metaboxes'] = $this;
 
-			if ( empty( self::$extension_dir ) ) {
-				$this->extension_dir = trailingslashit( str_replace( '\\', '/', dirname( __FILE__ ) ) );
-				$this->extension_url = site_url( str_replace( trailingslashit( str_replace( '\\', '/', ABSPATH ) ), '', $this->extension_dir ) );
-			}
+			$this->extension_dir = trailingslashit( str_replace( '\\', '/', dirname( __FILE__ ) ) );
+			$this->extension_url = site_url( str_replace( trailingslashit( str_replace( '\\', '/', ABSPATH ) ), '', $this->extension_dir ) );
 
 			// Only run metaboxes on the pages/posts, not the front-end.
 			// The DOING_AJAX check allows for redux_post_meta to work inside
@@ -275,11 +282,9 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 				if ( ! empty( $box['sections'] ) ) {
 					$this->sections = $box['sections'];
 
-					array_merge( $this->parent->sections, $box['sections'] );
-
 					$this->post_types = wp_parse_args( $this->post_types, $box['post_types'] );
 
-					// Checking to overide the parent variables.
+					// Checking to override the parent variables.
 					$add_field = false;
 
 					foreach ( $box['post_types'] as $type ) {
@@ -445,7 +450,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 		 * @return array
 		 */
 		public function override_options( array $options ): array {
-			$this->parent->_default_values();
+			$this->parent->default_values();
 			$this->parent_defaults = $this->parent->options_defaults;
 
 			$meta = $this->get_meta( $this->post_id );
@@ -552,7 +557,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 					}
 
 					delete_transient( $this->parent->args['opt_name'] . '-transients-metaboxes' );
-					$this->parent->_enqueue();
+					$this->parent->enqueue_class->init();
 
 					// phpcs:ignore WordPress.NamingConventions.ValidHookName
 					do_action( "redux/metaboxes/{$this->parent->args['opt_name']}/enqueue" );
@@ -566,12 +571,14 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 					 *
 					 * @param string  bundled stylesheet src
 					 */
-					wp_enqueue_style(
-						'redux-extension-metaboxes-css',
-						apply_filters( "redux/metaboxes/{$this->parent->args['opt_name']}/enqueue/redux-extension-metaboxes-css", $this->extension_url . 'redux-extension-metaboxes.css' ), // phpcs:ignore: WordPress.NamingConventions.ValidHookName
-						array(),
-						self::$version
-					);
+					if ( $this->parent->args['dev_mode'] ) {
+						wp_enqueue_style(
+							'redux-extension-metaboxes-css',
+							apply_filters( "redux/metaboxes/{$this->parent->args['opt_name']}/enqueue/redux-extension-metaboxes-css", $this->extension_url . 'redux-extension-metaboxes.css' ), // phpcs:ignore: WordPress.NamingConventions.ValidHookName
+							array(),
+							self::$version
+						);
+					}
 
 					/**
 					 * Redux metaboxes JS
@@ -857,7 +864,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 							'showposts' => 1,
 						);
 
-						if ( get_posts( $args ) === $post ) {
+						if ( isset( $post ) && get_posts( $args ) === $post ) {
 							return $post[0]->ID;
 						}
 					}
@@ -912,7 +919,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 									continue;
 								}
 
-								if ( in_array( $field['type'], array( 'ace_editor' ), true ) && isset( $field['options'] ) ) {
+								if ( 'ace_editor' === $field['type'] && isset( $field['options'] ) ) {
 									$this->boxes[ $key ]['sections'][ $sk ]['fields'][ $k ]['args'] = $field['options'];
 									unset( $this->boxes[ $key ]['sections'][ $sk ]['fields'][ $k ]['options'] );
 								}
@@ -924,7 +931,15 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 									$this->boxes[ $key ]['sections'][ $sk ]['fields'][ $k ] = $field;
 								}
 
-								$this->parent->field_default_values( $field );
+								$this->parent->options_defaults_class->field_default_values( $this->parent->args['opt_name'], $field );
+
+								if ( 'repeater' === $field['type'] ) {
+									foreach ( $field['fields'] as $f ) {
+										$this->parent->options_defaults_class->field_default_values( $this->parent->args['opt_name'], $f, null, true );
+									}
+								}
+
+								$this->parent->options_defaults = $this->parent->options_defaults_class->options_defaults;
 							}
 						}
 					}
@@ -1035,11 +1050,11 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 		 */
 		private function field_default( $field_id ) {
 			if ( ! isset( $this->parent->options_defaults ) ) {
-				$this->parent->options_defaults = $this->parent->_default_values();
+				$this->parent->options_defaults = $this->parent->default_values();
 			}
 
 			if ( ! isset( $this->parent->options ) || empty( $this->parent->options ) ) {
-				$this->parent->get_options();
+				$this->parent->options_class->get();
 			}
 
 			$this->options = $this->parent->options;
@@ -1224,7 +1239,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 									continue;
 								}
 
-								echo $this->parent->section_menu( $s_key, $section, '_box_' . $metabox['id'], $sections ); // phpcs:ignore WordPress.Security.EscapeOutput
+								echo $this->parent->render_class->section_menu( $s_key, $section, '_box_' . $metabox['id'], $sections ); // phpcs:ignore WordPress.Security.EscapeOutput
 							}
 							?>
 						</ul>
@@ -1274,7 +1289,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 
 								echo '<tr valign="top"' . $ex_style . '>'; // phpcs:ignore WordPress.Security.EscapeOutput
 
-								$th = $this->parent->get_header_html( $field );
+								$th = $this->parent->render_class->get_header_html( $field );
 
 								if ( $is_hidden ) {
 									$str_pos = strpos( $th, 'redux_field_th' );
@@ -1418,7 +1433,7 @@ if ( ! class_exists( 'Redux_Extension_Metaboxes', false ) ) {
 			// phpcs:ignore WordPress.NamingConventions.ValidHookName
 			$to_save = apply_filters( 'redux/metaboxes/save/before_validate', $to_save, $to_compare, $this->sections );
 
-			$validate = $this->parent->_validate_values( $to_save, $to_compare, $this->sections );
+			$validate = $this->parent->validate_class->validate( $to_save, $to_compare, $this->sections );
 
 			// Validate fields (if needed).
 			foreach ( $to_save as $key => $value ) {

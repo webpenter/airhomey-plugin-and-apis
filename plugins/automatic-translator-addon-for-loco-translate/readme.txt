@@ -3,8 +3,9 @@ Contributors: narinder-singh, satindersingh
 Donate link: https://paypal.me/CoolPlugins/10USD/
 Tags: translate, translation, translator, localization, language, translations, loco, loco translate, loco addon, google translate, deepl
 Requires at least: 4.5
-Tested up to: 5.8.1
+Tested up to:6.0
 Requires PHP: 5.6
+Loco Translate:2.6.1
 Stable tag: trunk
 License: GPLv2 or later
 License URI: http://www.gnu.org/licenses/gpl-2.0.html
@@ -58,7 +59,7 @@ https://www.youtube.com/watch?v=yBYugUHzwbQ
 (Limited free docs translations / day or purchase DeepL Pro)
 * ✅ **Premium Support:** Quick Email Support
 (contact@coolplugins.net -**Support time:- 24-48 hours**)
-* **Buy Premium License:** [$18 - $88 🛒](https://locoaddon.com/addon/loco-automatic-translate-premium-license-key/#pricing)
+* **Premium License:** [Buy Now 🛒](https://locoaddon.com/addon/loco-automatic-translate-premium-license-key/#pricing)
 
 > DeepL Doc Translator provides limited number of free docs translations per day, you can purchase their pro license to increase this limit.
 
@@ -136,6 +137,17 @@ There is no limit. Yes, you can translate unlimited characters without any API k
 5. Premium License Pricing 
 
 == Changelog ==
+<strong>Version 2.3.1 |02/05/2022 </strong>
+<pre>
+Fixed:scripts not loading in other language
+</pre>
+<strong>Version 2.3 | 29/04/2022 </strong>
+<pre>
+Improved: Overall Code improvements.
+Removed: No need to active free version with PRO anymore.
+Fixed:Large string translation merge bug.
+</pre>
+
 <strong>Version 2.2.3 | 05/10/2021 </strong>
 <pre>
 Fixed:License notice issue

@@ -1,7 +1,11 @@
 <?php
-namespace LocoAutoTranslateAddon\FeedbackForm;
 
-class FeedbackForm{
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
+if (!class_exists('ATLT_FeedbackForm')) {
+
+class ATLT_FeedbackForm{
 
 	private $plugin_url = ATLT_URL;
 	private $plugin_version = ATLT_VERSION;
@@ -25,10 +29,9 @@ class FeedbackForm{
     |   Enqueue all scripts and styles to required page only          |
     |-----------------------------------------------------------------|
     */
-    function enqueue_feedback_scripts(){
-        $screen = get_current_screen();
-        if( isset( $screen ) && $screen->id == 'plugins' ){
-            wp_enqueue_script(__NAMESPACE__.'feedback-script', $this->plugin_url .'includes/Feedback/js/admin-feedback.js',array('jquery'),$this->plugin_version );
+    function enqueue_feedback_scripts($hook){
+        if($hook == 'plugins.php' ){
+            wp_enqueue_script('atlt-free-feedback-script', $this->plugin_url .'includes/Feedback/js/admin-feedback.js',array('jquery'),$this->plugin_version );
             wp_enqueue_style('cool-plugins-feedback-style', $this->plugin_url .'includes/Feedback/css/admin-feedback.css',null,$this->plugin_version );
         }
     }
@@ -43,6 +46,7 @@ class FeedbackForm{
 		if( !isset( $screen ) || $screen->id != 'plugins' ){
 			return;
 		}
+        
 		$deactivate_reasons = [
 			'didnt_work_as_expected' => [
 				'title' => __( 'The plugin didn\'t work as expected', 'cool-plugins' ),
@@ -161,4 +165,6 @@ class FeedbackForm{
         }
 
     }
+}
+
 }

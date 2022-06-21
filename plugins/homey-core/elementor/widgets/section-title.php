@@ -112,7 +112,7 @@ class Homey_Elementor_Section_Title extends Widget_Base {
             [
                 'name'     => 'section_title_typography',
                 'label'    => esc_html__( 'Section Title', 'homey-core' ),
-                'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
+                'scheme'   => Core\Schemes\Typography::TYPOGRAPHY_1,
                 'selector' => '{{WRAPPER}} .homey_section_title',
                 'fields_options' => [
                     // Inner control name
@@ -133,7 +133,7 @@ class Homey_Elementor_Section_Title extends Widget_Base {
             [
                 'name'     => 'section_subtitle_typography',
                 'label'    => esc_html__( 'Section Subtitle ', 'homey-core' ),
-                'scheme'   => Scheme_Typography::TYPOGRAPHY_1,
+                'scheme'   => Core\Schemes\Typography::TYPOGRAPHY_1,
                 'selector' => '{{WRAPPER}} .homey_section_subtitle',
                 'fields_options' => [
                     // Inner control name

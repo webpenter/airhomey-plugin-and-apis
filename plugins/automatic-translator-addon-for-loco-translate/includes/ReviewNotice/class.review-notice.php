@@ -1,30 +1,23 @@
 <?php
-namespace LocoAutoTranslateAddon\ALTLReviewNotice;
 
+if ( ! defined( 'ABSPATH' ) ) {
+	exit; // Exit if accessed directly
+}
 if (!class_exists('ALTLReviewNotice')) {
     class ALTLReviewNotice {
-        /**
-         * The Constructor
-         */
-        public function __construct() {
-            // register actions
-         
-            if(is_admin()){
-                add_action( 'admin_notices',array($this,'atlt_admin_notice_for_reviews'));
-               add_action( 'admin_print_scripts', array($this, 'atlt_load_script' ) );
-                add_action( 'wp_ajax_atlt_dismiss_notice',array($this,'atlt_dismiss_review_notice' ) );
-            }
-        }
-
     /**
-	 * Load script to dismiss notices.
-	 *
-	 * @return void
-	 */
-	public function atlt_load_script() {
-        wp_register_style( 'atlt-feedback-notice-styles',ATLT_URL.'assets/css/atlt-admin-feedback-notice.css' );
-        wp_enqueue_style( 'atlt-feedback-notice-styles' );
+     * The Constructor
+     */
+    public function __construct() {
+        // register actions
+        
+        if(is_admin()){
+            add_action( 'admin_notices',array($this,'atlt_admin_notice_for_reviews'));
+            add_action( 'wp_ajax_atlt_dismiss_notice',array($this,'atlt_dismiss_review_notice' ) );
+        }
     }
+
+    
     // ajax callback for review notice
     public function atlt_dismiss_review_notice(){
         $rs=update_option( 'atlt-already-rated','yes' );
@@ -46,11 +39,12 @@ if (!class_exists('ALTLReviewNotice')) {
            }
             
             // grab plugin installation date and compare it with current date
-            $display_date = date( 'Y-m-d h:i:s' );
+            $display_date = gmdate( 'Y-m-d h:i:s' );
             $install_date= new \DateTime( $installation_date );
             $current_date = new \DateTime( $display_date );
             $difference = $install_date->diff($current_date);
             $diff_days= $difference->days;
+          
             // check if installation days is greator then week
 			if (isset($diff_days) && $diff_days>=3) {
                 echo $this->atlt_create_notice_content();

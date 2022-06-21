@@ -1,0 +1,27 @@
+/* style icon */
+
+a.toplevel_page_njt-fs-filemanager .dashicons-admin-generic:before {
+  content: '' !important;
+}
+
+a.toplevel_page_njt-fs-filemanager .wp-menu-image:before {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%23f0f5fa99%22%20width%3D%2220px%22%20height%3D%2220px%22%3E%3Cpath%20d%3D%22M10%204H4c-1.1%200-1.99.9-1.99%202L2%2018c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E") no-repeat !important;
+  margin-top: 6px;
+  padding-bottom: 0px;
+}
+
+li.toplevel_page_njt-fs-filemanager.wp-menu-open a.toplevel_page_njt-fs-filemanager .wp-menu-image:before {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22white%22%20width%3D%2220px%22%20height%3D%2220px%22%3E%3Cpath%20d%3D%22M10%204H4c-1.1%200-1.99.9-1.99%202L2%2018c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E") no-repeat !important;
+}
+
+li.toplevel_page_njt-fs-filemanager:hover a.toplevel_page_njt-fs-filemanager .wp-menu-image:before {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%2300b9eb%22%20width%3D%2220px%22%20height%3D%2220px%22%3E%3Cpath%20d%3D%22M10%204H4c-1.1%200-1.99.9-1.99%202L2%2018c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E") no-repeat !important;
+}
+
+li.toplevel_page_njt-fs-filemanager a.toplevel_page_njt-fs-filemanager:focus .wp-menu-image:before {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22%2300b9eb%22%20width%3D%2220px%22%20height%3D%2220px%22%3E%3Cpath%20d%3D%22M10%204H4c-1.1%200-1.99.9-1.99%202L2%2018c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E") no-repeat !important;
+}
+
+li.toplevel_page_njt-fs-filemanager.wp-menu-open:hover a.toplevel_page_njt-fs-filemanager .wp-menu-image:before {
+  background: url("data:image/svg+xml,%3Csvg%20xmlns%3D%22http%3A%2F%2Fwww.w3.org%2F2000%2Fsvg%22%20viewBox%3D%220%200%2024%2024%22%20fill%3D%22white%22%20width%3D%2220px%22%20height%3D%2220px%22%3E%3Cpath%20d%3D%22M10%204H4c-1.1%200-1.99.9-1.99%202L2%2018c0%201.1.9%202%202%202h16c1.1%200%202-.9%202-2V8c0-1.1-.9-2-2-2h-8l-2-2z%22%2F%3E%3Cpath%20d%3D%22M0%200h24v24H0z%22%20fill%3D%22none%22%2F%3E%3C%2Fsvg%3E") no-repeat !important;
+}
