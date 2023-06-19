@@ -22,6 +22,135 @@ global $wp_version;
 *	Set up theme default and register various supported features.
 *	----------------------------------------------------------------------------------
 */
+
+if( !function_exists('api_get_author_by_id') ) {
+    function api_get_author_by_id($w = '36', $h = '36', $classes = 'img-responsive img-circle', $ID) {
+        
+        global $homey_local;
+        $author = array();
+        $prefix = 'homey_';
+        $comma = ' ';
+        $maximumPoints = 100;
+        $point = 0;
+
+        $author['is_photo'] = false;
+        $author['is_email'] = false;
+
+        $custom_img = get_template_directory_uri().'/images/avatar.png';
+
+        $author_picture_id = get_the_author_meta( 'homey_author_picture_id' , $ID );
+
+        $doc_verified = get_the_author_meta( 'doc_verified' , $ID);
+        $author[ 'id' ] = $ID;
+        $author[ 'name' ] = get_the_author_meta( 'display_name' , $ID );
+        $author[ 'email' ] = get_the_author_meta( 'email', $ID );
+        $author[ 'bio' ] = get_the_author_meta( 'description' , $ID );
+
+        if( !empty( $author_picture_id ) ) {
+            $point+=30;
+
+            $author_picture_id = intval( $author_picture_id );
+            if ( $author_picture_id ) {
+
+                $photo = wp_get_attachment_url( $author_picture_id);
+                
+                if(!empty($photo)) {
+                    $author[ 'photo' ] = $photo;
+                } else {
+                    $author[ 'photo' ] = esc_url($custom_img);
+                }
+
+                $author['is_photo'] = true;
+            }
+        } else {
+            $author[ 'photo' ] = esc_url($custom_img);
+        }
+
+        //counting listings with statues
+        //$author[ 'all_listing_count' ]          = homey_hm_user_listing_count($ID);
+        //$author[ 'publish_listing_count' ]      = homey_hm_user_publish_listing_count($ID);
+        //$author[ 'all_featured_listing_count' ] = homey_featured_listing_count($ID);
+
+        $native_language  = get_the_author_meta( $prefix.'native_language' , $ID );
+        $other_language  =  get_the_author_meta( $prefix.'other_language' , $ID );
+        if(!empty($other_language) && !empty($native_language)) {
+            $comma = ', ';
+        }
+
+        $author['facebook']     =  get_the_author_meta( 'homey_author_facebook' , $ID );
+        $author['twitter']      =  get_the_author_meta( 'homey_author_twitter' , $ID );
+        $author['linkedin']     =  get_the_author_meta( 'homey_author_linkedin' , $ID );
+        $author['pinterest']    =  get_the_author_meta( 'homey_author_pinterest' , $ID );
+        $author['instagram']    =  get_the_author_meta( 'homey_author_instagram' , $ID );
+        $author['googleplus']   =  get_the_author_meta( 'homey_author_googleplus' , $ID );
+        $author['youtube']      =  get_the_author_meta( 'homey_author_youtube' , $ID );
+        $author['vimeo']        =  get_the_author_meta( 'homey_author_vimeo' , $ID );
+        $author[ 'link' ] = get_author_posts_url( $ID );
+        $author[ 'address' ] = get_the_author_meta( $prefix.'street_address' , $ID );
+        $author[ 'country' ] = get_the_author_meta( $prefix.'country' , $ID);
+        $author[ 'state' ] = get_the_author_meta( $prefix.'state' , $ID);
+        $author[ 'city' ] = get_the_author_meta( $prefix.'city' , $ID);
+        $author[ 'area' ] = get_the_author_meta( $prefix.'area' , $ID);
+        $author[ 'is_superhost' ] = get_the_author_meta( 'is_superhost' , $ID);
+        $author[ 'doc_verified' ] = $doc_verified;
+        $author[ 'user_document_id' ] = get_the_author_meta( 'homey_user_document_id' , $ID );
+        $author[ 'doc_verified_request' ] = get_the_author_meta( 'id_doc_verified_request' , $ID );
+        $author[ 'native_language' ] = $native_language;
+        $author[ 'other_language' ] = $other_language;
+        $author[ 'total_earnings' ] = homey_get_host_total_earnings($ID);
+        $author[ 'available_balance' ] = homey_get_host_available_earnings($ID);
+        $author[ 'languages' ] = esc_attr($native_language.$comma.$other_language);
+
+        // Emergency Contact 
+        $author[ 'em_contact_name' ] = get_the_author_meta( $prefix.'em_contact_name' , $ID);
+        $author[ 'em_relationship' ] = get_the_author_meta( $prefix.'em_relationship' , $ID);
+        $author[ 'em_email' ] = get_the_author_meta( $prefix.'em_email' , $ID);
+        $author[ 'em_phone' ] = get_the_author_meta( $prefix.'em_phone' , $ID);
+
+        $author[ 'payout_payment_method' ] = get_the_author_meta( 'payout_payment_method' , $ID);
+        $author[ 'payout_paypal_email' ] = get_the_author_meta( 'payout_paypal_email' , $ID);
+        $author[ 'payout_skrill_email' ] = get_the_author_meta( 'payout_skrill_email' , $ID);
+
+        // Beneficiary Information
+        $author[ 'ben_first_name' ] = get_the_author_meta( 'ben_first_name' , $ID);
+        $author[ 'ben_last_name' ] = get_the_author_meta( 'ben_last_name' , $ID);
+        $author[ 'ben_company_name' ] = get_the_author_meta( 'ben_company_name' , $ID);
+        $author[ 'ben_tax_number' ] = get_the_author_meta( 'ben_tax_number' , $ID);
+        $author[ 'ben_street_address' ] = get_the_author_meta( 'ben_street_address' , $ID);
+        $author[ 'ben_apt_suit' ] = get_the_author_meta( 'ben_apt_suit' , $ID);
+        $author[ 'ben_city' ] = get_the_author_meta( 'ben_city' , $ID);
+        $author[ 'ben_state' ] = get_the_author_meta( 'ben_state' , $ID);
+        $author[ 'ben_zip_code' ] = get_the_author_meta( 'ben_zip_code' , $ID);
+
+        //Wire Transfer Information
+        $author[ 'bank_account' ] = get_the_author_meta( 'bank_account' , $ID);
+        $author[ 'swift' ] = get_the_author_meta( 'swift' , $ID);
+        $author[ 'bank_name' ] = get_the_author_meta( 'bank_name' , $ID);
+        $author[ 'wir_street_address' ] = get_the_author_meta( 'wir_street_address' , $ID);
+        $author[ 'wir_aptsuit' ] = get_the_author_meta( 'wir_aptsuit' , $ID);
+        $author[ 'wir_city' ] = get_the_author_meta( 'wir_city' , $ID);
+        $author[ 'wir_state' ] = get_the_author_meta( 'wir_state' , $ID);
+        $author[ 'wir_zip_code' ] = get_the_author_meta( 'wir_zip_code' , $ID);
+
+
+        if(!empty($author[ 'email' ])) {
+            $point+=30;
+
+            $author['is_email'] = true;
+        }
+
+        if($doc_verified) {
+            $point+=40;
+        }
+
+        $percentage = ($point*$maximumPoints)/100;
+        $author[ 'profile_status' ] = $percentage."%";
+        $author[ 'is_email_verified' ] = get_the_author_meta( 'is_email_verified', $ID );
+
+        return $author;
+    }
+}
+
 if( !function_exists('homey_add_reservation_fn') ) {
     function homey_add_reservation_fn($request) {
 
@@ -257,103 +386,109 @@ if( !function_exists('homey_add_reservation_fn') ) {
 
 
 if(!function_exists('homey_instance_booking_fn')) {
-    function homey_instance_booking_fn() {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        $userID       = $_POST['user_id'];//$current_user->ID;
-        $local = homey_get_localization();
-        $allowded_html = array();
-        $instace_page_link = homey_get_template_link_2('template/template-instance-booking.php');
-
-        $booking_hide_fields = homey_option('booking_hide_fields');
-
-
-        if ($userID === 0 ) {
-            return json_encode(
-                array(
-                    'message' => $local['login_for_reservation']
-                )
-            );
-            wp_die();
-        }
-
-        if ( empty($instace_page_link) ) {
-            return json_encode(
-                array(
-                    'message' => $local['instance_booking_page']
-                )
-            );
-            wp_die();
-        }
-
-        //check security
-        // $nonce = $_REQUEST['security'];
-        // if ( ! wp_verify_nonce( $nonce, 'reservation-security-nonce' ) ) {
-
-        //     echo json_encode(
-        //         array(
-        //             'success' => false,
-        //             'message' => $local['security_check_text']
-        //         )
-        //     );
-        //     wp_die();
-        // }
-
-        $listing_id = intval($_POST['listing_id']);
-        $listing_owner_id  =  get_post_field( 'post_author', $listing_id );
-        $check_in_date     =  wp_kses ( $_POST['check_in_date'], $allowded_html );
-        $check_out_date    =  wp_kses ( $_POST['check_out_date'], $allowded_html );
-        $guest_message    =  wp_kses ( $_POST['guest_message'], $allowded_html );
-        $guests   =  intval($_POST['guests']);
-        $extra_options   =  $_POST['extra_options'];
-        
-        if($userID == $listing_owner_id) {
-            return json_encode(
-                array(
-                    'message' => $local['own_listing_error']
-                )
-            );
-            wp_die();
-        }
-        /*
-        if(!homey_is_renter()) {
+        function homey_instance_booking_fn() {
+            global $current_user;
+            $current_user = wp_get_current_user();
+            $userID       = $current_user->ID;
+            $local = homey_get_localization();
+            $allowded_html = array();
+            $instace_page_link = homey_get_template_link_2('template/template-instance-booking.php');
+    
+            $booking_hide_fields = homey_option('booking_hide_fields');
+    
+    
+            if ( !is_user_logged_in() || $userID === 0 ) {
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['login_for_reservation']
+                    )
+                );
+                wp_die();
+            }
+    
+            if ( empty($instace_page_link) ) {
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['instance_booking_page']
+                    )
+                );
+                wp_die();
+            }
+    
+            //check security
+            $nonce = $_REQUEST['security'];
+            if ( ! wp_verify_nonce( $nonce, 'reservation-security-nonce' ) ) {
+    
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['security_check_text']
+                    )
+                );
+                wp_die();
+            }
+    
+            $listing_id = intval($_POST['listing_id']);
+            $listing_owner_id  =  get_post_field( 'post_author', $listing_id );
+            $check_in_date     =  wp_kses ( $_POST['check_in_date'], $allowded_html );
+            $check_out_date    =  wp_kses ( $_POST['check_out_date'], $allowded_html );
+            $guest_message    =  wp_kses ( $_POST['guest_message'], $allowded_html );
+            $guests   =  intval($_POST['guests']);
+            $extra_options   =  $_POST['extra_options'];
+    
+            if($userID == $listing_owner_id) {
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['own_listing_error']
+                    )
+                );
+                wp_die();
+            }
+            /*
+            if(!homey_is_renter()) {
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['host_user_cannot_book']
+                    )
+                );
+                wp_die();
+            }
+            */
+    
+            if(empty($guests) && $booking_hide_fields['guests'] != 1) {
+                echo json_encode(
+                    array(
+                        'success' => false,
+                        'message' => $local['choose_guests']
+                    )
+                );
+                wp_die();
+    
+            }
+    
+            $instance_page = add_query_arg( array(
+                'check_in' => $check_in_date,
+                'check_out' => $check_out_date,
+                'guest' => $guests,
+                'extra_options' => $extra_options,
+                'listing_id' => $listing_id,
+                'guest_message' => $guest_message,
+            ), $instace_page_link );
+    
             echo json_encode(
                 array(
-                    'success' => false,
-                    'message' => $local['host_user_cannot_book']
+                    'success' => true,
+                    'message' => __('Submitting, Please wait...', 'homey'),
+                    'instance_url' =>  $instance_page
                 )
             );
             wp_die();
         }
-        */
-
-        if(empty($guests) && $booking_hide_fields['guests'] != 1) {
-            return json_encode(
-                array(
-                    'message' => $local['choose_guests']
-                )
-            );
-            wp_die();
-
-        }
-
-        $instance_page = add_query_arg( array(
-            'check_in' => $check_in_date,
-            'check_out' => $check_out_date,
-            'guest' => $guests,
-            'extra_options' => $extra_options,
-            'listing_id' => $listing_id,
-            'guest_message' => $guest_message,
-        ), $instace_page_link );
-
-        return json_encode(
-            array(
-                'message' => __('Submitting, Please wait...', 'homey'),
-                'instance_url' =>  $instance_page
-            )
-        );
-        wp_die();
-    }
+    
 }
 
     if(!function_exists('get_custom_period')) {
@@ -555,7 +690,11 @@ if(!function_exists('list_detail_fn')) {
             $per_night_text = esc_html__('Per Night', 'homey');
             $per_nightguest_text = esc_html__('Per Night Per Guest', 'homey');
         }
-      $listing['listing_id']  =$listing_id;
+        $instant_booking = get_post_meta($listing_id, $homey_prefix.'instant_booking', true);
+        $offsite_payment = homey_option('off-site-payment');
+        $listing['listing_id']  =$listing_id;
+        $listing['instant_booking']  =$instant_booking;
+        $listing['offsite_payment']  =$offsite_payment;
        $listing['title']  =get_the_title($listing_id);
        $listing['description']  =wp_strip_all_tags( get_the_content() );
        $listing['price']  =$listing_price;
@@ -1167,7 +1306,6 @@ if(!function_exists('homey_half_map_fn')) {
         $listing['guests']  = $guests;
         $listing['beds']  = $beds;
         $listing['baths']  = $baths;
-        $listing['featured']   = get_post_meta( get_the_ID(), 'homey_featured', true );
         
         if($cgl_types != 1) {
             $listing['listing_type']  = '';
@@ -1403,45 +1541,454 @@ if(!function_exists('search_availability')) {
             $check_in->modify('tomorrow');
             $check_in_unix =   $check_in->getTimestamp();
         }
-        $reservation_id = array(
-            "listing_id" =>$request->get_param('listing_id'),
-            "check_in_date" =>$request->get_param('check_in_date'),
-            "check_out_date" =>$request->get_param('check_out_date'),
-            "guests" =>$request->get_param('guests') ? $request->get_param('guests') :  '0',
-            "extra_options" =>$request->get_param('extra_options') ? $request->get_param('extra_options') :  '',
-          );
-        
-        if(empty($reservation_id)) {
-          return 
-            array(
-                'success' => false,
-                'message' => "Some thing went wrong!"
-            );
-        wp_die();
-        }
-        $extra_options = intval( $reservation_id['extra_options']);
 
-        $listing_id     = intval($reservation_id['listing_id']);
-        $check_in_date  = wp_kses ( $reservation_id['check_in_date'], $allowded_html );
-        $check_out_date = wp_kses ( $reservation_id['check_out_date'], $allowded_html );
-        $guests         = intval($reservation_id['guests']);
+        $listing_id     = intval($request->get_param('listing_id'));
+        $check_in_date  = wp_kses ($request->get_param('check_in_date'), $allowded_html );
+        $check_out_date = wp_kses ( $request->get_param('check_out_date'), $allowded_html );
+        $extra_options = $request->get_param('extra_options') ? $request->get_param('extra_options') : '';
+        $guests         = $request->get_param('guests') ? $request->get_param('guests') :  '0';
+
+        $booking_type = homey_booking_type_by_id($listing_id);
+        
+        if( $booking_type == 'per_week' ) {
+            $output= calculate_booking_cost_ajax_weekly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options);
+        } else if( $booking_type == 'per_month' ) {
+            $output= calculate_booking_cost_ajax_monthly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options);
+        } else if( $booking_type == 'per_day_date' ) {
+            $output= calculate_booking_cost_ajax_day_date($listing_id, $check_in_date, $check_out_date, $guests, $extra_options);
+            
+        } else {
+            $output= calculate_booking_cost_ajax_nightly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options);
+        }
+        $booking_check=array(
+            'success' => true,
+            'message' => $local['dates_available']
+        );
+        $result= array (
+            'booking_cost'=>$output,
+            'booking_check'=>$booking_check
+        );
+        return $result;
+        wp_die();
+        
+                       
+    }
+}
+
+
+if( !function_exists('calculate_booking_cost_ajax_weekly') ) {
+    function calculate_booking_cost_ajax_weekly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options) {
+
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = array();
+
+
+
+        $prices_array = homey_get_weekly_prices($check_in_date, $check_out_date, $listing_id, $guests, $extra_options);
+
+        $price_per_week = homey_formatted_price($prices_array['price_per_week'], true);
+        $no_of_weeks = $prices_array['total_weeks_count'];
+        $no_of_days = $prices_array['days_count'];
+        $weeks_total_price = homey_formatted_price($prices_array['weeks_total_price'], false);
+
+        $cleaning_fee = homey_formatted_price($prices_array['cleaning_fee']);
+        $services_fee = $prices_array['services_fee'];
+        $taxes = $prices_array['taxes'];
+        $taxes_percent = $prices_array['taxes_percent'];
+        $city_fee = homey_formatted_price($prices_array['city_fee']);
+        $security_deposit = $prices_array['security_deposit'];
+        $additional_guests = $prices_array['additional_guests'];
+        $additional_guests_price = $prices_array['additional_guests_price'];
+        $additional_guests_total_price = $prices_array['additional_guests_total_price'];
+
+        $extra_prices_html = $prices_array['extra_prices_html'];
+        $upfront_payment = $prices_array['upfront_payment'];
+        $balance = $prices_array['balance'];
+        $total_price = $prices_array['total_price'];
+
+        if($no_of_days > 1) {
+            $night_label = homey_option('glc_day_nights_label');
+        } else {
+            $night_label = homey_option('glc_day_night_label');
+        }
+
+        if($no_of_weeks > 1) {
+            $week_label = homey_option('glc_weeks_label');
+        } else {
+            $week_label = homey_option('glc_week_label');
+        }
+
+        if($additional_guests > 1) {
+            $add_guest_label = $local['cs_add_guests'];
+        } else {
+            $add_guest_label = $local['cs_add_guest'];
+        }
+
+
+        $output['cs_total'] =esc_attr($local['cs_total']);
+        $output['cs_tax_fees'] =esc_attr($local['cs_tax_fees']);
+        $output['total_price'] =homey_formatted_price($total_price);
+        $output['price_per_week'] =($price_per_week).' x '.esc_attr($no_of_weeks);
+
+        if( $no_of_days > 0 ) {
+            $output['no_of_days'] =esc_attr($no_of_days);
+        }
+
+        $output['weeks_total_price'] =$weeks_total_price;
+
+
+        if(!empty($additional_guests)) {
+            $output['additional_guests'] =esc_attr($additional_guests).' '.homey_formatted_price($additional_guests_total_price);
+        }
+
+        if(!empty($prices_array['cleaning_fee']) && $prices_array['cleaning_fee'] != 0) {
+            $output['cleaning_fee'] =esc_attr($local['cs_cleaning_fee']).' '.($cleaning_fee);
+        }
+
+        if(!empty($extra_prices_html)) {
+            $output['extra_prices_html'] =$extra_prices_html;
+        }
+
+        if(!empty($prices_array['city_fee']) && $prices_array['city_fee'] != 0) {
+            $output['city_fee'] =esc_attr($local['cs_city_fee']).' '.($city_fee);
+        }
+
+
+
+        if(!empty($security_deposit) && $security_deposit != 0) {
+            $output['security_deposit'] =esc_attr($local['cs_sec_deposit']).' '.homey_formatted_price($security_deposit);
+        }
+
+        if(!empty($services_fee) && $services_fee != 0 ) {
+            $output['services_fee'] =esc_attr($local['cs_services_fee']).' '.homey_formatted_price($services_fee);
+        }
+
+        if(!empty($taxes) && $taxes != 0 ) {
+            $output['taxes'] =esc_attr($local['cs_taxes']).' '.esc_attr($taxes_percent).'% '.homey_formatted_price($taxes);
+        }
+
+        if(!empty($upfront_payment) && $upfront_payment != 0) {
+            $output['cs_payment'] =esc_attr($local['cs_payment_due']).' '.homey_formatted_price($upfront_payment);
+            $output['upfront_payment'] =$upfront_payment;
+        }
+        return $output;
+        wp_die();
+
+    }
+}
+
+if( !function_exists('calculate_booking_cost_ajax_monthly') ) {
+    function calculate_booking_cost_ajax_monthly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options) {
+
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = array();
+
+        $prices_array = homey_get_monthly_prices($check_in_date, $check_out_date, $listing_id, $guests, $extra_options);
+
+        $price_per_month = homey_formatted_price($prices_array['price_per_month'], true);
+        $no_of_months = $prices_array['total_months_count'];
+        $no_of_days = $prices_array['days_count'];
+        $months_total_price = homey_formatted_price($prices_array['months_total_price'], false);
+
+        $cleaning_fee = homey_formatted_price($prices_array['cleaning_fee']);
+        $services_fee = $prices_array['services_fee'];
+        $taxes = $prices_array['taxes'];
+        $taxes_percent = $prices_array['taxes_percent'];
+        $city_fee = homey_formatted_price($prices_array['city_fee']);
+        $security_deposit = $prices_array['security_deposit'];
+        $additional_guests = $prices_array['additional_guests'];
+        $additional_guests_price = $prices_array['additional_guests_price'];
+        $additional_guests_total_price = $prices_array['additional_guests_total_price'];
+
+        $extra_prices_html = $prices_array['extra_prices_html'];
+        $upfront_payment = $prices_array['upfront_payment'];
+        $balance = $prices_array['balance'];
+        $total_price = $prices_array['total_price'];
+
+        if($no_of_days > 1) {
+            $night_label = homey_option('glc_day_nights_label');
+        } else {
+            $night_label = homey_option('glc_day_night_label');
+        }
+
+        if($no_of_months > 1) {
+            $month_label = homey_option('glc_months_label');
+        } else {
+            $month_label = homey_option('glc_month_label');
+        }
+
+        if($additional_guests > 1) {
+            $add_guest_label = $local['cs_add_guests'];
+        } else {
+            $add_guest_label = $local['cs_add_guest'];
+        }
+
+
+        $output ['cs_total']=esc_attr($local['cs_total']);
+        $output ['cs_tax_fees']=esc_attr($local['cs_tax_fees']);
+        $output ['total_price']=homey_formatted_price($total_price);
+        $output ['price_per_month']=($price_per_month).' x '.esc_attr($no_of_months);
+
+        if( $no_of_days > 0 ) {
+            $output ['no_of_days']=esc_attr($no_of_days);
+        }
+
+        $output ['months_total_price']=$months_total_price;
+
+
+        if(!empty($additional_guests)) {
+            $output ['additional_guests']=esc_attr($additional_guests).' '.homey_formatted_price($additional_guests_total_price);
+        }
+
+        if(!empty($prices_array['cleaning_fee']) && $prices_array['cleaning_fee'] != 0) {
+            $output ['cleaning_fee']=esc_attr($local['cs_cleaning_fee']).' '.($cleaning_fee);
+        }
+
+        if(!empty($extra_prices_html)) {
+            $output ['extra_prices_html']= $extra_prices_html;
+        }
+
+        if(!empty($prices_array['city_fee']) && $prices_array['city_fee'] != 0) {
+            $output ['city_fee']=esc_attr($local['cs_city_fee']).' '.($city_fee);
+        }
+
+
+
+        if(!empty($security_deposit) && $security_deposit != 0) {
+            $output ['security_deposit']=esc_attr($local['cs_sec_deposit']).' '.homey_formatted_price($security_deposit);
+        }
+
+        if(!empty($services_fee) && $services_fee != 0 ) {
+            $output ['services_fee']=esc_attr($local['cs_services_fee']).' '.homey_formatted_price($services_fee);
+        }
+
+        if(!empty($taxes) && $taxes != 0 ) {
+            $output ['taxes']=esc_attr($local['cs_taxes']).' '.esc_attr($taxes_percent).'% '.homey_formatted_price($taxes);
+        }
+
+        if(!empty($upfront_payment) && $upfront_payment != 0) {
+            $output ['cs_payment']=esc_attr($local['cs_payment_due']).' '.homey_formatted_price($upfront_payment);
+            $output ['cs_payment']=$upfront_payment;
+        }
+        return $output;
+        wp_die();
+
+    }
+}
+
+if( !function_exists('calculate_booking_cost_ajax_day_date') ) {
+    function calculate_booking_cost_ajax_day_date($listing_id, $check_in_date, $check_out_date, $guests, $extra_options) {
+
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+
+        $prices_array = homey_get_day_date_prices($check_in_date, $check_out_date, $listing_id, $guests, $extra_options);
+
+        $price_per_night = homey_formatted_price($prices_array['price_per_day_date'], true);
+        $no_of_days = $prices_array['days_count'];
+
+        $nights_total_price = homey_formatted_price($prices_array['nights_total_price'], false);
+
+        $cleaning_fee = homey_formatted_price($prices_array['cleaning_fee']);
+        $services_fee = $prices_array['services_fee'];
+        $taxes = $prices_array['taxes'];
+        $taxes_percent = $prices_array['taxes_percent'];
+        $city_fee = homey_formatted_price($prices_array['city_fee']);
+        $security_deposit = $prices_array['security_deposit'];
+        $additional_guests = $prices_array['additional_guests'];
+        $additional_guests_price = $prices_array['additional_guests_price'];
+        $additional_guests_total_price = $prices_array['additional_guests_total_price'];
+
+        $booking_has_weekend = $prices_array['booking_has_weekend'];
+        $booking_has_custom_pricing = $prices_array['booking_has_custom_pricing'];
+        $with_weekend_label = $local['with_weekend_label'];
+
+        $extra_prices_html = $prices_array['extra_prices_html'];
+        $upfront_payment = $prices_array['upfront_payment'];
+        $balance = $prices_array['balance'];
+        $total_price = $prices_array['total_price'];
+
+        if($no_of_days > 1) {
+            $day_label = homey_option('glc_day_dates_label');
+        } else {
+            $day_label = homey_option('glc_day_date_label');
+        }
+
+        if($additional_guests > 1) {
+            $add_guest_label = $local['cs_add_guests'];
+        } else {
+            $add_guest_label = $local['cs_add_guest'];
+        }
+
+
+        $output=array();
+        $output ['cs_total']=esc_attr($local['cs_total']);
+        $output ['cs_tax_fees']=esc_attr($local['cs_tax_fees']);
+        
+        $output ['total_price']=homey_formatted_price($total_price);
+        
+        if($booking_has_custom_pricing == 1 && $booking_has_weekend == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($local['with_custom_period_and_weekend_label']).')'.esc_attr($nights_total_price);
+
+        } elseif($booking_has_weekend == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($with_weekend_label).') '.$nights_total_price;
+
+        } elseif($booking_has_custom_pricing == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($local['with_custom_period_label']).') '.esc_attr($nights_total_price);
+
+        } else {
+            $output ['nights_total_price']=$price_per_night.' x '.esc_attr($no_of_days).' '.$nights_total_price;
+        }
+
+        if(!empty($additional_guests)) {
+            $output ['guests_total_price']= homey_formatted_price($additional_guests_total_price);
+        }
+
+        if(!empty($prices_array['cleaning_fee']) && $prices_array['cleaning_fee'] != 0) {
+            $output ['cleaning_fee']= $cleaning_fee;
+        }
+
+        if(!empty($extra_prices_html)) {
+            $output ['extra_prices_html']= $extra_prices_html;
+        }
+
+        if(!empty($prices_array['city_fee']) && $prices_array['city_fee'] != 0) {
+            $output ['city_fee']=$city_fee;
+        }
+
+
+
+        if(!empty($security_deposit) && $security_deposit != 0) {
+            $output ['security_deposit']=homey_formatted_price($security_deposit);
+        }
+
+        if(!empty($services_fee) && $services_fee != 0 ) {
+            $output ['services_fee']= homey_formatted_price($services_fee);
+        }
+
+        if(!empty($taxes) && $taxes != 0 ) {
+            $output ['taxes']= homey_formatted_price($taxes);
+        }
+
+        if(!empty($upfront_payment) && $upfront_payment != 0) {
+            $output ['formatted_price']= homey_formatted_price($upfront_payment);
+            $output['upfront_payment']=$upfront_payment;
+        }
+        return $output;
+
+        wp_die();
+
+    }
+}
+
+if( !function_exists('calculate_booking_cost_ajax_nightly') ) {
+    function calculate_booking_cost_ajax_nightly($listing_id, $check_in_date, $check_out_date, $guests, $extra_options) {
+
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = '';
 
         $prices_array = homey_get_prices($check_in_date, $check_out_date, $listing_id, $guests, $extra_options);
+
+        $price_per_night = homey_formatted_price($prices_array['price_per_night'], true);
+        $no_of_days = $prices_array['days_count'];
+
+        $nights_total_price = homey_formatted_price($prices_array['nights_total_price'], false);
+
+        $cleaning_fee = homey_formatted_price($prices_array['cleaning_fee']);
+        $services_fee = $prices_array['services_fee'];
+        $taxes = $prices_array['taxes'];
+        $taxes_percent = $prices_array['taxes_percent'];
+        $city_fee = homey_formatted_price($prices_array['city_fee']);
+        $security_deposit = $prices_array['security_deposit'];
+        $additional_guests = $prices_array['additional_guests'];
+        $additional_guests_price = $prices_array['additional_guests_price'];
+        $additional_guests_total_price = $prices_array['additional_guests_total_price'];
+
+        $booking_has_weekend = $prices_array['booking_has_weekend'];
+        $booking_has_custom_pricing = $prices_array['booking_has_custom_pricing'];
         $with_weekend_label = $local['with_weekend_label'];
+
+        $extra_prices_html = $prices_array['extra_prices_html'];
+        $upfront_payment = $prices_array['upfront_payment'];
+        $balance = $prices_array['balance'];
+        $total_price = $prices_array['total_price'];
+
+        if($no_of_days > 1) {
+            $night_label = homey_option('glc_day_nights_label');
+        } else {
+            $night_label = homey_option('glc_day_night_label');
+        }
+
+        if($additional_guests > 1) {
+            $add_guest_label = $local['cs_add_guests'];
+        } else {
+            $add_guest_label = $local['cs_add_guest'];
+        }
+
+        $output=array();
+        $output ['cs_total']=esc_attr($local['cs_total']);
+        $output ['cs_tax_fees']=esc_attr($local['cs_tax_fees']);
         
-        $array1= $prices_array;
-        $array2= array( 'success' => true ,'message' => $local['dates_available']);
-        $d = array(
-            "booking_cost" => $array1,
-            "booking_check" => $array2
-          );
-        $result = $d;
-        return $result;
-         
-         
+        $output ['total_price']=homey_formatted_price($total_price);
+        
+        if($booking_has_custom_pricing == 1 && $booking_has_weekend == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($local['with_custom_period_and_weekend_label']).')'.esc_attr($nights_total_price);
+
+        } elseif($booking_has_weekend == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($with_weekend_label).') '.$nights_total_price;
+
+        } elseif($booking_has_custom_pricing == 1) {
+            $output ['nights_total_price']=esc_attr($no_of_days).' '.esc_attr($night_label).' ('.esc_attr($local['with_custom_period_label']).') '.esc_attr($nights_total_price);
+
+        } else {
+            $output ['nights_total_price']=$price_per_night.' x '.esc_attr($no_of_days).' '.esc_attr($night_label).' '.$nights_total_price;
+        }
+
+        if(!empty($additional_guests)) {
+            $output ['guests_total_price']= homey_formatted_price($additional_guests_total_price);
+        }
+
+        if(!empty($prices_array['cleaning_fee']) && $prices_array['cleaning_fee'] != 0) {
+            $output ['cleaning_fee']= $cleaning_fee;
+        }
+
+        if(!empty($extra_prices_html)) {
+            $output ['extra_prices_html']= $extra_prices_html;
+        }
+
+        if(!empty($prices_array['city_fee']) && $prices_array['city_fee'] != 0) {
+            $output ['city_fee']=$city_fee;
+        }
+
+
+
+        if(!empty($security_deposit) && $security_deposit != 0) {
+            $output ['security_deposit']=homey_formatted_price($security_deposit);
+        }
+
+        if(!empty($services_fee) && $services_fee != 0 ) {
+            $output ['services_fee']= homey_formatted_price($services_fee);
+        }
+
+        if(!empty($taxes) && $taxes != 0 ) {
+            $output ['taxes']= homey_formatted_price($taxes);
+        }
+
+        if(!empty($upfront_payment) && $upfront_payment != 0) {
+            $output ['formatted_price']= homey_formatted_price($upfront_payment);
+            $output['upfront_payment']=$upfront_payment;
+        }
+        return $output;
+
         wp_die();
-    
-                       
+
     }
 }
 
@@ -1561,13 +2108,15 @@ if(!function_exists('messages')) {
 
         $thread_class = 'msg-unread new-message';
         $tabel = $wpdb->prefix . 'homey_thread_messages';
+        $tabel2 = $wpdb->prefix . 'homey_threads';
         $thread_id = $thread->id;
 
 
         $homey_sql = $wpdb->prepare(
             "
-                SELECT * 
+                SELECT $tabel.*, $tabel2.receiver_id, $tabel2.sender_id
                 FROM $tabel 
+                join $tabel2 on $tabel2.id=$tabel.thread_id
                 WHERE thread_id = %d
                 ORDER BY id " .$sort,
             $thread_id
@@ -1583,7 +2132,7 @@ if(!function_exists('messages')) {
         }
         // $image_array = wp_get_attachment_image_src( $author_picture_id, array('40', '40'), "", array( "class" => 'img-circle' ) );
 
-        $homey_current_user_info = homey_get_author_by_id('60', '60', 'img-circle', $user_for_photo_id);
+        $homey_current_user_info = api_get_author_by_id('60', '60', 'img-circle', $user_for_photo_id);
         $user_custom_picture = $homey_current_user_info['photo'];
 
         if( empty($user_custom_picture) ) {
@@ -1624,14 +2173,20 @@ if(!function_exists('messages')) {
         if( !empty($last_sender_first_name) && !empty($last_sender_last_name) ) {
             $last_sender_display_name = $last_sender_first_name.' '.$last_sender_last_name;
         }
+        
+            $messae['thread_class'] =$thread_class;
             $messae['thread_id'] =intval($thread_id);
+            $messae['id'] =intval($thread_id);
             $messae['sender_id'] = $sender_id;
+			//$messae['receiver_id'] = $receiver_id;
             $messae['last_message_id'] = $last_message->id;
 
             $messae['custom_picture'] = $user_custom_picture;
-            $messae['display_name'] = ucfirst( $sender_display_name ); 
+            $messae['sender_display_name'] = ucfirst( $sender_display_name ); 
             $messae['message_time'] = date_i18n( homey_convert_date(homey_option('homey_date_format')).' '.get_option('time_format'), strtotime( $last_message->time ) );
-            $messae['display_name'] = esc_attr($last_sender_display_name);
+            $messae['last_sender_display_name'] = esc_attr($last_sender_display_name);
+			$messae['last_sender_id'] = $last_message->created_by;
+			$messae['last_receiver_id'] =$last_message->receiver_id;
             $messae['message'] = str_replace("\\", "", html_entity_decode($last_message->message)); 
             $messaea[]=$messae;
             }
@@ -1643,7 +2198,402 @@ if(!function_exists('messages')) {
 
     }
 }    
+if(!function_exists('message_detail_fn')) {
+    function message_detail_fn()
+       {
+        global $wpdb, $current_user;
+            $current_user_id =   $_GET['user_id'];
+            $tabel = $wpdb->prefix . 'homey_threads';
+            $thread_id = $_GET['thread_id'];
+            $user_status = 'Offline';
 
+            $sort = isset($_REQUEST['sort']) ? $_REQUEST['sort'] : 'ASC';
+
+            if ( isset( $_GET['seen'] ) && $_GET['seen'] == 1 ) {
+                homey_update_message_status( $current_user_id, $thread_id );
+            } 
+
+            $sql_thread = $wpdb->prepare(
+                "
+                SELECT * 
+                FROM $tabel 
+                WHERE id = %d
+                ",
+                $thread_id
+            );
+
+            $homey_thread = $wpdb->get_row($sql_thread);
+
+            $homey_thread_messages = $wpdb->prefix . 'homey_thread_messages';
+
+            $sql_messages = $wpdb->prepare(
+                "
+                SELECT * 
+                FROM $homey_thread_messages 
+                WHERE thread_id = %d
+                ORDER BY id ".$sort,
+                $thread_id
+            );
+
+            $homey_messages = $wpdb->get_results($sql_messages);
+
+            $thread_author = $homey_thread->sender_id;
+            $thread_sender_delete = $homey_thread->sender_delete;
+            $thread_receiver_delete = $homey_thread->receiver_delete;
+
+            if ( $thread_author == $current_user_id ) {
+                $thread_author = $homey_thread->receiver_id;
+            }
+
+            $sender_id = $homey_thread->sender_id;
+            $receiver_id = $homey_thread->receiver_id;
+
+            $user_can_reply = false;
+            if($sender_id == $current_user_id || $receiver_id == $current_user_id || homey_is_admin()) {
+                $user_can_reply = true;
+            }
+
+
+            $thread_author_first_name  =  get_the_author_meta( 'first_name', $thread_author );
+            $thread_author_last_name  =  get_the_author_meta( 'last_name', $thread_author );
+            $thread_author_display_name = get_the_author_meta( 'display_name', $thread_author );
+            if( !empty($thread_author_first_name) && !empty($thread_author_last_name) ) {
+                $thread_author_display_name = $thread_author_first_name.' '.$thread_author_last_name;
+            }
+
+            // $author_picture_id =  get_the_author_meta( 'homey_author_picture_id' , $thread_author );
+            // $image_array = wp_get_attachment_image_src( $author_picture_id, array('40', '40'), "", array( "class" => 'img-circle' ) );
+
+            $homey_author_info = api_get_author_by_id('60', '60', 'img-circle', $thread_author);
+            $user_custom_picture = $homey_author_info['photo'];
+
+            if( !$user_custom_picture ) {
+                $user_custom_picture = get_template_directory_uri().'/images/profile-avatar.png';
+            }
+                $msgFrom=array();
+            if( $user_can_reply ) { 
+                $msgFrom['id']= $user_custom_picture;
+                $msgFrom['imageUri']= $user_custom_picture;
+                $msgFrom['name']= ucfirst( $thread_author_display_name );
+                $msgFrom['thread_author']= homey_is_user_online( $thread_author );
+                $chat=array();
+                $msgattachment= array();
+                foreach ( $homey_messages AS $message ) {
+                    $mchat=array();
+                    $message_class = '';
+                    $message_id = $message->id;
+                    $message_author = $message->created_by;
+                    
+                  $message_author_last_name  =  get_the_author_meta( 'last_name', $message_author );
+                  $message_author_display_name = get_the_author_meta( 'display_name', $message_author );
+                  if( !empty($message_author_first_name) && !empty($message_author_last_name) ) {
+                    $message_author_display_name = $message_author_first_name.' '.$message_author_last_name;
+                  }
+                  $message_author_name = ucfirst( $message_author_display_name );
+                   
+                    if ( $message_author == $current_user_id ) {
+                        $message_author_name = esc_html__( 'Me', 'homey' );
+                        $message_class = 'msg-me';
+                    }
+        
+                    // $author_picture_id =  get_the_author_meta( 'homey_author_picture_id' , $message_author );
+                    // $image_array = wp_get_attachment_image_src( $author_picture_id, array('40', '40'), "", array( "class" => 'img-circle' ) );
+        
+                     $message_owner_info = api_get_author_by_id('60', '60', 'img-circle', $message_author);
+                    $message_author_picture = $message_owner_info['photo'];
+        
+                    if ( empty( @$message_author_picture )) {
+                        $message_author_picture = get_template_directory_uri().'/images/profile-avatar.png';
+                    }
+        
+                    if($current_user_id == $message_author) {
+                        $delete = $message->sender_delete;
+                    } else {
+                        $delete = $message->receiver_delete;
+                    }
+        
+                    if($delete != 1) {
+                        //$mchat['message_author_picture']= $message_author_picture; 
+                         //date_i18n( homey_convert_date(homey_option('homey_date_format')), strtotime( $message->time ) );
+                        
+                        //$mchat['user_can_reply']= $user_can_reply;
+                        $mchat['id']= intval($message_id);
+                        $mchat['content']= str_replace("\\","", wp_specialchars_decode($message->message));
+                        $mchat['createdAt']=$message->time ;
+                        // $mchat['user_id']= intval($message_author);
+                        // $mchat['message_author_name']= esc_attr($message_author_name);
+                        $mchat['user']=  array('id'=>intval($message_author),
+                        'name'=>esc_attr($message_author_name));
+                            if ( !empty( $message->attachments ) ) {
+        
+                                $attachments = unserialize( $message->attachments );
+        
+                                if ( sizeof( $attachments ) ) {
+                                    foreach ( $attachments AS $attachment ) {
+        
+                                        $attachment_url  = wp_get_attachment_url( $attachment );
+        
+                                        $msgattachment['attachment_url']= esc_url($attachment_url); 
+                                        $msgattachment['attachment']= get_the_title( $attachment );
+                                    }
+                                }
+        
+                            }
+                         $chat[]=   $mchat;
+                    }
+                }
+                if($user_can_reply == 1) {
+                    if($thread_sender_delete != 1 && $thread_receiver_delete != 1) {
+
+                        $homey_current_user_info = api_get_author_by_id('60', '60', 'img-circle', $current_user_id);
+                        $author_photo = $homey_current_user_info['photo'];
+                        if ( empty( @$author_photo )) {
+                            $current_user_picture = get_template_directory_uri().'/images/profile-avatar.png'; 
+                           
+                         }else{
+                            $msgFrom['author_photo']=  $author_photo;
+                        }
+                    }else{
+                        echo '<div id="message_auth" class="error notice is-dismissible"><p>'.esc_html_e("This message thread is deleted from the owner, so you can't reply this.", 'homey').'</p></div>';
+                      }
+                  }else{
+                        echo '<div id="message_auth" class="error notice is-dismissible"><p>'.esc_html_e('You are not allowed to access this', 'homey').'</p></div>';
+                      }
+               return $result=array(
+                'id'=>'1',
+                'users'=>$msgFrom,
+                'messages'=>$chat,
+                'msgattachment'=>$msgattachment,
+               );       
+            } else {
+               esc_html_e('You are not allowed to access this', 'homey'); 
+            }
+       }
+}        
+
+if ( !function_exists( 'api_start_thread' ) ) {
+
+	function api_start_thread() {
+
+		$messages_page = homey_get_template_link_2('template/dashboard-messages.php');
+
+		// $nonce = $_POST['start_thread_form_ajax'];
+
+		// if ( !wp_verify_nonce( $nonce, 'start-thread-form-nonce') ) {
+		// 	echo json_encode( array(
+		// 		'success' => false,
+		// 		'msg' => esc_html__('Unverified Nonce!', 'homey')
+		// 	));
+		// 	wp_die();
+		// }
+
+		if ( empty( $_POST['message'] ) ) {
+			echo json_encode( array(
+				'success' => false,
+				'msg' => esc_html__('Please write something in message', 'homey')
+			));
+			wp_die();
+		}
+        $user_id=$_POST['user_id'];
+        if(!empty($_POST['listing_id'])) {
+            $reservationID = $_POST['listing_id'];
+        } else {
+            wp_die('Are you Kidding?'); 
+        }
+        
+        if( !give_access($reservationID,$user_id) ) {
+            wp_die('Are you Kidding? '); 
+        }
+        
+        $renter_id = get_post_meta($reservationID, 'listing_renter', true);
+        $renter_info = homey_get_author_by_id('60', '60', 'img-circle', $renter_id);
+        
+        $owner_id = get_post_meta($reservationID, 'listing_owner', true);
+        $owner_info = homey_get_author_by_id('60', '60', 'img-circle', $owner_id);
+        
+        if( $user_id == $owner_id ) {
+            $receiver_id = $renter_id;
+        } else {
+            $receiver_id = $owner_id;
+        }
+        $_POST['receiver_id']=$receiver_id;
+		if (!empty( $_POST['user_id'] ) && !empty( $_POST['listing_id'] ) && !empty( $_POST['message'] ) ) {
+
+			$message_attachments = array();
+			if ( $_POST['listing_image_ids'] != 0 ) {
+				$message_attachments = $_POST['listing_image_ids'];
+			}
+			$message_attachments = serialize( $message_attachments );
+
+			$message = sanitize_textarea_field($_POST['message']);
+			$thread_id = apply_filters( 'homey_start_thread', $_POST );
+			$message_id = apply_filters( 'api_filter_thread_message', $thread_id, $message, $message_attachments,$user_id );
+
+			if ( $message_id ) {
+				return $thread_id;
+// 				echo json_encode(
+// 					array(
+// 						'success' => true,
+//                         'thread_id' => $thread_id,
+// 						'msg' => esc_html__("Message sent successfully!", 'homey')
+// 					)
+// 				);
+
+				wp_die();
+
+			}
+
+		}
+
+		echo json_encode(
+			array(
+				'success' => false,
+				'msg' => esc_html__("Some errors occurred! Please try again.", 'homey')
+			)
+		);
+
+		wp_die();
+
+	}
+
+}
+if ( !function_exists( 'api_thread_message' ) ) {
+
+	function api_thread_message() {
+
+		// $nonce = $_POST['start_thread_message_form_ajax'];
+
+		// if ( !wp_verify_nonce( $nonce, 'start-thread-message-form-nonce') ) {
+		// 	echo json_encode( array(
+		// 		'success' => false,
+		// 		'url' => homey_get_template_link_2('template/dashboard-messages.php') . '?' . http_build_query( array( 'thread_id' => $thread_id, 'success' => false ) ),
+		// 		'msg' => esc_html__('Unverified Nonce!', 'homey')
+		// 	));
+		// 	wp_die();
+		// }
+
+		if ( empty( $_POST['message'] ) ) {
+			echo json_encode( array(
+				'success' => false,
+				'msg' => esc_html__('Please write something in message', 'homey')
+			));
+			wp_die();
+		}
+        $user_id=$_POST['user_id'];
+		if (!empty( $_POST['thread_id'] ) && !empty( $_POST['message'] ) && !empty( $_POST['user_id'] ) ) {
+			$message_attachments = Array ();
+			$thread_id = intval($_POST['thread_id']);
+			$message = sanitize_textarea_field($_POST['message']);
+
+			if ( $_POST['listing_image_ids']  != 0 ) {
+				$message_attachments = $_POST['listing_image_ids'];
+			}
+			$message_attachments = serialize( $message_attachments );
+			$message_id = apply_filters( 'api_filter_thread_message', $thread_id, $message, $message_attachments,$user_id );
+
+			if ( $message_id ) {
+				return $thread_id;
+// 				return json_encode(
+// 					array(
+// 						'success' => true,
+//                         'thread_id' => $thread_id,
+// 						'msg' => esc_html__("Thread success fully created!", 'homey')
+// 					)
+// 				);
+
+				wp_die();
+
+			}
+
+		}
+
+		return json_encode(
+			array(
+				'success' => false,
+				'msg' => esc_html__("Some errors occurred! Please try again.", 'homey')
+			)
+		);
+
+		wp_die();
+
+	}
+
+}
+
+add_filter( 'api_filter_thread_message', 'api_thread_message_filter', 3, 9 );
+
+if ( !function_exists( 'api_thread_message_filter' ) ) {
+
+	function api_thread_message_filter( $thread_id, $message, $attachments,$user_id ) {
+
+		global $wpdb, $current_user;
+
+		if ( is_array( $attachments ) ) {
+			$attachments = serialize( $attachments );
+		}
+
+		//wp_get_current_user();
+		$created_by =  $user_id;
+		$table_name = $wpdb->prefix . 'homey_thread_messages';
+
+		$message = stripslashes($message);
+		$message = htmlentities($message);
+
+		$message_id = $wpdb->insert(
+			$table_name,
+			array(
+				'created_by' => $created_by,
+				'thread_id' => intval($thread_id),
+				'message' => sanitize_textarea_field($message),
+				'attachments' => $attachments,
+				'time' => current_time( 'mysql' )
+			),
+			array(
+				'%d',
+				'%d',
+				'%s',
+				'%s',
+				'%s'
+			)
+		);
+
+		$tabel = $wpdb->prefix . 'homey_threads';
+		$wpdb->update(
+			$tabel,
+			array(  'seen' => 0 ),
+			array( 'id' => $thread_id ),
+			array( '%d' ),
+			array( '%d' )
+		);
+
+		$message_query = $wpdb->prepare( 
+            "
+            SELECT * 
+            FROM $tabel 
+            WHERE id = %d
+            ", 
+            $thread_id
+        );
+        $receiver_data="";
+		$homey_thread = $wpdb->get_row( $message_query );
+        $receiver_id  = $homey_thread->receiver_id;
+		$sender_id    = $homey_thread->sender_id;
+
+		if($created_by != $receiver_data){
+			$receiver_data = get_user_by( 'id', $receiver_id );
+			apply_filters( 'homey_message_email_notification', $thread_id, $message, $receiver_data->user_email, $created_by );
+		}
+		
+		if($created_by != $sender_id){
+			$sender_data = get_user_by( 'id', $sender_id );
+			apply_filters( 'homey_message_email_notification', $thread_id, $message, $sender_data->user_email, $created_by );
+		}
+		
+		return $message_id;
+
+	}
+
+}
 
 if(!function_exists('invoices')) {
  function invoices()
@@ -1747,7 +2697,7 @@ if(!function_exists('invoices')) {
             $user_info = get_userdata($invoice_data['invoice_buyer_id']);
             $invoice_detail = add_query_arg( 'invoice_id', get_the_ID(), $dashboard_invoices );
 
-            $invoice['ID']=  get_the_ID();
+            $invoice['id']=  get_the_ID();
 
             $wc_reference_order_id = get_post_meta( get_the_ID(), 'wc_reference_order_id', true); 
             $invoice['reference_id']=  $wc_reference_order_id > 0 ? 'wc#'.$wc_reference_order_id : '';
@@ -1757,9 +2707,9 @@ if(!function_exists('invoices')) {
             if($wc_reservation_reference_id > 0) {
                 $detail_link = add_query_arg( 'reservation_detail', $wc_reservation_reference_id, $reservation_page_link );
             }
-            $invoice['reference_id']=   $wc_reservation_reference_id > 0 ? '<a href="' .$detail_link.'" title="Reservation">resvr#'.$wc_reservation_reference_id.'</a>' : ''; 
-            $wc_order_id = get_wc_order_id(get_the_ID()); if($wc_order_id > 0) 
-            $invoice['order_id']= 'wc#'.$wc_order_id; 
+            $invoice['reference_id']=   $wc_reservation_reference_id; 
+            $wc_order_id = get_wc_order_id(get_the_ID());
+            $invoice['order_id']='#'.get_the_ID().' wc#'.$wc_reference_order_id.' resvr#'.$wc_reservation_reference_id ;
             $invoice['homey_date']=  get_the_date(homey_convert_date(homey_option('homey_date_format')));
              
              if($invoice_data['invoice_billion_for'] == 'reservation') {
@@ -1779,14 +2729,14 @@ if(!function_exists('invoices')) {
             } elseif($invoice_data['invoice_billion_for'] == 'package') {
             $invoice['billion_for']=  esc_attr($homey_local['inv_package']);
             }
-
-            $invoice['billing_type']= esc_html_e( $invoice_data['invoice_billing_type'], 'homey' );
+            $invoice['billion_for']=$invoice_data['invoice_billion_for'];
+            $invoice['billing_type']= $invoice_data['invoice_billing_type'];
 
             $invoice_status = get_post_meta(  get_the_ID(), 'invoice_payment_status', true );
             if( $invoice_status == 0 ) {
-            $invoice['invoice_status']='<span class="label label-warning">'.esc_attr($homey_local['not_paid']).'</span>';
+            $invoice['invoice_status']=esc_attr($homey_local['not_paid']);
             } else {
-            $invoice['invoice_status']='<span class="label label-success">'.esc_attr($homey_local['paid']).'</span>';
+            $invoice['invoice_status']=esc_attr($homey_local['paid']);
             }
             $invoice['payment_method']= esc_html__($invoice_data['invoice_payment_method'], 'homey');
             $reservation_meta = get_post_meta($invoice_data['invoice_item_id'], 'reservation_meta', true);
@@ -1901,7 +2851,9 @@ if(!function_exists('invoices_detail')) {
 
     $detail['invoice_logo'] = esc_url($invoice_logo);
     $detail['invoice_company_name'] =  esc_attr($invoice_company_name);
-    $detail['invoice_address'] =  homey_option( 'invoice_address' );
+    
+    $upaddress=wp_strip_all_tags(homey_option( 'invoice_address' ), $remove_breaks = false);
+    $detail['invoice_address'] =homey_option( 'invoice_address' );//preg_replace( '/[\r\n\t ]+/', ' ]', $upaddress );
     $detail['invoice_id'] =  esc_attr($invoice_id);
     $detail['publish_date'] =  esc_attr($publish_date);
     $detail['invoice_item_id'] =  esc_attr($invoice_item_id);
@@ -1912,9 +2864,9 @@ if(!function_exists('invoices_detail')) {
         $resv_id = $invoice_item_id;
         $is_hourly = get_post_meta($resv_id, 'is_hourly', true);
         if($is_hourly == 'yes') {
-    $detail['h_reservation_cost'] =homey_calculate_hourly_reservation_cost($resv_id);
+    $detail['cost_day2'] =homey_calculate_hourly_reservation_cost($resv_id);
         } else {
-    $detail['reservation_cost'] = homey_calculate_reservation_cost($resv_id); 
+    $detail['cost_day'] = calculate_reservation_cost($resv_id,$userID); 
         }
         
     } else {
@@ -1935,7 +2887,205 @@ if(!function_exists('invoices_detail')) {
     }
 }    
 
+if(!function_exists('wallet_fn')) {
+    function wallet_fn()
+       {
+        global $current_user, $reservation_page_link, $wallet_page_link, $earnings_page_link, $payout_request_link;
+        $current_user = wp_get_current_user();
+        $userID       =$_GET['user_id'];  //$current_user->ID;
+        $local = homey_get_localization();
+        $allowded_html = array();
 
+        $dashboard_profile = homey_get_template_link_dash('template/dashboard-profile.php');
+        $payment_method_setup = add_query_arg( 'dpage', 'payment-method', $dashboard_profile );
+
+        if(api_is_host($userID)) {
+            $host_id = $userID;
+            $userID = $host_id;
+        } else {
+            $host_id = null;
+        }
+        $getlimit       =$_GET['limit'] ? $_GET['limit'] : 5;
+        $host_earnings = homey_get_earnings($limit = $getlimit, $host_id);
+        $payouts = homey_get_host_payouts($limit = $getlimit, $host_id);
+        $available_balance = homey_get_host_available_earnings($userID);
+        $total_earnings = homey_get_host_total_earnings($userID);
+        $output=array();
+        if($total_earnings != 0) {
+            $output['total_earnings']= homey_formatted_price($total_earnings); 
+        } else {
+            $output['total_earnings']= homey_simple_currency_format($total_earnings);
+        }
+        if($available_balance != 0) {
+            $output['available_balance']=  homey_formatted_price($available_balance); 
+        } else {
+            $output['available_balance']=  homey_simple_currency_format($available_balance);
+        }
+        $output['reservation_count']= homey_reservation_count($userID); 
+        $output['host_fee_percent']= homey_get_host_fee_percent($userID).'%';
+        $earnings_array=array();
+        foreach ($host_earnings as $data) { 
+            $array_data=array();
+            $array_data['id']= $data->id;
+            $array_data['reservation_id']= $data->reservation_id;
+            $array_data['listing_id']=$data->listing_id;
+            $array_data['services_fee']=$data->services_fee;
+            $array_data['host_fee']= $data->host_fee;
+            $array_data['listing']= mb_strimwidth(get_the_title($data->listing_id), 0, 20, "..."); 
+            $array_data['net_earnings']=  $data->net_earnings;
+            $datetime = $data->time;
+
+            $datetime_unix = strtotime($datetime);
+            $array_data['date']=  date_i18n( homey_convert_date(homey_option('homey_date_format')), strtotime( $datetime ) );//homey_return_formatted_date($datetime_unix);
+            $time = homey_get_formatted_time($datetime_unix);
+
+            $resrv_link = add_query_arg( 'reservation_detail', $data->reservation_id, $reservation_page_link );
+
+            $earning_detail = add_query_arg( 'detail',$data->id, $wallet_page_link );
+            $earnings_array[]=$array_data;
+            }
+            $output['host_earnings']=$earnings_array;
+            $payout_array=array();
+            if(!empty($payouts)) { 
+            foreach ($payouts as $payout) {
+                $payouts_array=array();
+                $amount = $payout->total_amount;
+                $payouts_array['id'] = $payout->id;
+                $payouts_array['payout_status'] = homey_get_payout_status($payout->payout_status);
+                $payouts_array['transfer_fee'] =homey_formatted_price($payout->transfer_fee);
+                $date_requested = $payout->date_requested;
+                $date_processed = $payout->date_processed;
+                $payouts_array['date_processed'] = homey_format_date_simple($date_processed);
+                $date_requested_unix = strtotime($date_requested);
+                $request_date = homey_return_formatted_date($date_requested_unix);
+                $payouts_array['date_requested'] =homey_format_date_simple(esc_attr($date_requested));
+                $payouts_array['request_time'] = homey_get_formatted_time($date_requested_unix);
+
+
+                $date_processed_unix = strtotime($date_processed);
+                $processed_date = homey_return_formatted_date($date_processed_unix);
+                $processed_time = homey_get_formatted_time($date_processed_unix);
+                
+                $price_prefix = '';
+                $payout_action = $payout->action;
+                if($payout_action == 'add_money') {
+                    $price_prefix = '+';
+                } elseif($payout_action == 'deduct_money') {
+                    $price_prefix = '-';
+                }
+                $payouts_array['amount'] = esc_attr($price_prefix).' '.homey_formatted_price($amount); 
+                if($payout_status == 1) {
+                    $class = 'warning';
+                } elseif($payout_status == 2) {
+                    $class = 'default';
+                } elseif($payout_status == 3) {
+                    $class = 'success';
+                }elseif($payout_status == 4) {
+                    $class = 'danger';
+                }    
+                $payout_array[]=$payouts_array;
+            }
+            }
+            $output['payouts']=$payout_array;
+            return $output;
+
+       }
+}   
+
+if(!function_exists('wallet_detail_fn')) {
+    function wallet_detail_fn()
+    {
+        global $homey_local, $reservation_page_link, $wallet_page_link, $earnings_page_link, $payout_request_link;
+        $user_id=$_GET['user_id'];
+        $earning_id = $_GET['detail'] ? $_GET['detail'] : '';
+        
+        $earning_detail = get_earning_detail($earning_id,$user_id);
+        $resrv_link = '';
+        $result=array();
+        
+        if(!empty($earning_detail)) {
+            $ID = $earning_detail->id;
+            $user_id = $earning_detail->user_id;
+            $reservation_id = $earning_detail->reservation_id;
+            $listing_id = $earning_detail->listing_id;
+            $services_fee = $earning_detail->services_fee;
+            $host_fee = $earning_detail->host_fee;
+            $upfront_payment = $earning_detail->upfront_payment;
+            $paid_locally = $earning_detail->payment_due;
+            $security_deposit = $earning_detail->security_deposit;
+            $total_amount = $earning_detail->total_amount;
+            $net_earnings = $earning_detail->net_earnings;
+            $chargeable_amount = $earning_detail->chargeable_amount;
+            $host_fee_percent = $earning_detail->host_fee_percent;
+            $datetime = $earning_detail->time;
+        
+            $datetime_unix = strtotime($datetime);
+            $date = homey_return_formatted_date($datetime_unix);
+            $time = homey_get_formatted_time($datetime_unix);
+            $resrv_link = add_query_arg( 'reservation_detail', $reservation_id, $reservation_page_link );
+        
+            $renter_id = get_post_meta($reservation_id, 'listing_renter', true);
+            $is_hourly = get_post_meta($reservation_id, 'is_hourly', true);
+        
+            if(api_is_host($user_id)) {
+                $total_amount = $total_amount - $services_fee;
+                $upfront_payment = $upfront_payment - $services_fee;
+            }
+            
+            if($is_hourly == 'yes') {
+                $result['cost_wallet']= calculate_hourly_cost_for_wallet($reservation_id);
+            } else {
+                $result['cost_wallet']= calculate_cost_for_wallet($reservation_id); 
+            }
+            $result['reservation_id']= esc_attr($reservation_id);
+            $result['date']= homey_format_date_simple(esc_attr($date)); 
+            $result['time']= esc_attr($time);
+            $result['listing']= get_the_title($listing_id); 
+            $result['display_name']= get_the_author_meta('display_name' , $renter_id);
+            $result['total_amount']= homey_formatted_price($total_amount);
+            $result['upfront_payment']= homey_formatted_price($upfront_payment);
+             if(!empty($paid_locally)) {
+                $result['paid_locally']= homey_formatted_price($paid_locally);
+             }$result['paid_locally']= homey_formatted_price($paid_locally);
+             $result['subtotal']= homey_formatted_price($chargeable_amount);
+            if(!api_is_host($user_id)) {
+                $result['services_fee']= homey_formatted_price($services_fee);
+              } 
+              $result['host_fee_percent']= esc_attr($host_fee_percent);
+              $result['host_fee']= homey_formatted_price($host_fee); 
+              $result['net_earnings']= homey_formatted_price($net_earnings);   
+              return $result;
+
+        }
+    }
+}      
+
+if(!function_exists('get_earning_detail')) {
+    function get_earning_detail($id,$userID) {
+        global $wpdb, $current_user;
+        $current_user = wp_get_current_user();
+        //$userID       = $current_user->ID;
+        $local = homey_get_localization();
+        $allowded_html = array();
+
+        $table_name = $wpdb->prefix . 'homey_earnings';
+
+        $sql_query = $wpdb->prepare( 
+            "
+            SELECT * 
+            FROM $table_name 
+            WHERE user_id = %d AND id = %d
+            ", 
+            $userID,
+            $id
+        );
+
+        $results = $wpdb->get_row($sql_query);
+
+        return $results;
+
+    }
+}
 
 if(!function_exists('destinations')) {
  function destinations()
@@ -2152,10 +3302,10 @@ if(!function_exists('rservation')) {
             $meta_query = array(); 
             $booking_hide_fields = homey_option('booking_hide_fields');
 
-            //$total_reservations = homey_posts_count('homey_reservation');
+            $total_reservations = homey_posts_count('homey_reservation');
 
 
-            $listing_no   =  '9';
+            $listing_no   =  "9";
             $paged        = (get_query_var('paged')) ? get_query_var('paged') : 1;
             $args = array(
                 'post_type'        =>  'homey_reservation',
@@ -2171,7 +3321,6 @@ if(!function_exists('rservation')) {
                 );
 
             }
-
             if( api_is_renter($userID) ) {
                 $meta_query[] = array(
                     'key' => 'listing_renter',
@@ -2203,18 +3352,18 @@ if(!function_exists('rservation')) {
             }
             $listings = array();
             $res_query = new WP_Query($args);
-
+            
                             if( $res_query->have_posts() ):
         while ($res_query->have_posts()): $res_query->the_post(); 
                 $listing = array();
                 $is_hourly = get_post_meta(get_the_ID(), 'is_hourly', true);
 
-                                
+                     
             global $homey_prefix, $homey_local;
             $renter_id = get_post_meta(get_the_ID(), 'listing_renter', true);
             $listing_author = api_get_author_by_id('40', '40', 'img-circle media-object avatar', $renter_id);
 
-
+                                 
             $check_in = get_post_meta(get_the_ID(), 'reservation_checkin_date', true);
             $check_out = get_post_meta(get_the_ID(), 'reservation_checkout_date', true);
             $reservation_guests = get_post_meta(get_the_ID(), 'reservation_guests', true);
@@ -2224,18 +3373,18 @@ if(!function_exists('rservation')) {
             $deposit = get_post_meta(get_the_ID(), 'reservation_upfront', true);
             $total_amount = get_post_meta(get_the_ID(), 'reservation_total', true);
             $reservation_status = get_post_meta(get_the_ID(), 'reservation_status', true);
-
+                          
             if(api_is_renter($userID)) {
                 $reservation_page_link = homey_get_template_link('template/dashboard-reservations.php');
             } else {
 
-                if(!listing_guest(get_the_ID(),$userID)) {
+                if(!homey_listing_guest(get_the_ID())) {
                     $reservation_page_link = homey_get_template_link('template/dashboard-reservations.php');
                 } else {
                     $reservation_page_link = homey_get_template_link('template/dashboard-reservations2.php');
                 }
             }
-
+            
             $detail_link = add_query_arg( 'reservation_detail', get_the_ID(), $reservation_page_link );
 
             $no_upfront = homey_option('reservation_payment');
@@ -2260,6 +3409,7 @@ if(!function_exists('rservation')) {
             $listing['link']= esc_url($listing_author['link']); 
             $listing['photo']= $listing_author['photo'];
         } 
+        
         $listing['id']= get_the_ID();
             $wc_order_id = get_wc_order_id(get_the_ID()); 
             if($wc_order_id > 0) $listing['order_id']= $wc_order_id;
@@ -2278,7 +3428,7 @@ if(!function_exists('rservation')) {
             } 
             $listing['pets_allow']= esc_attr($pets_allow); 
             $listing['price']= homey_formatted_price($price);
-            if( listing_guest(get_the_ID(),$userID) ) {
+            if( homey_listing_guest(get_the_ID()) ) {
                 if($reservation_status == 'available') {
                     $listing['detail_link']= esc_url($detail_link);
                     $listing['paynow_label']= $homey_local['res_paynow_label'];
@@ -2296,30 +3446,15 @@ if(!function_exists('rservation')) {
                 }
             }
             $listings[]=$listing;
+           
                 endwhile;
+                return $listings;
                     return $listings;
                 else: 
                     
                     $listing['not_found']= esc_attr($homey_local['reservation_not_found']);
             endif; 
             return $listings;
-    }
-}
-
-if(!function_exists('give_access')) {
-    function give_access($reservationID,$user_id) {
-        global $current_user;
-        $current_user = wp_get_current_user();
-        //$user_id = $current_user->ID; 
-
-        $listing_renter_id = get_post_meta($reservationID, 'listing_renter', true);
-        $listing_owner_id = get_post_meta($reservationID, 'listing_owner', true);
-
-        if( ( $user_id == $listing_owner_id ) || ( $user_id == $listing_renter_id ) || api_is_admin($user_id) ) {
-            return true;
-        }
-
-        return false;
     }
 }
 
@@ -2403,13 +3538,11 @@ if( !function_exists('api_is_admin') ) {
         return false;
     }
 }
-
-
 if(!function_exists('decline_reservation_fn')) {
     function decline_reservation_fn() {
         global $current_user;
         $current_user = wp_get_current_user();
-        $userID       = $current_user->ID;
+        $userID       = $_POST['userID'];//$current_user->ID;
         $local = homey_get_localization();
 
         $reservation_id = intval($_POST['reservation_id']);
@@ -2458,7 +3591,7 @@ if(!function_exists('confirm_reservation_fn')) {
     function confirm_reservation_fn() {
         global $current_user;
         $current_user = wp_get_current_user();
-        $userID       = $current_user->ID;
+        $userID       = $_POST['userID'];//$current_user->ID;
         $local = homey_get_localization();
         $no_upfront = homey_option('reservation_payment');
 
@@ -3096,7 +4229,7 @@ if( !function_exists('calculate_reservation_cost_weekly') ) {
 }
 
 if( !function_exists('calculate_reservation_cost_nightly') ) {
-    function calculate_reservation_cost_nightly($reservation_id, $userID, $collapse = false) {
+    function calculate_reservation_cost_nightly($reservation_id, $userID, $collapse = true) {
         $prefix = 'homey_';
         $local = homey_get_localization();
         $allowded_html = array();
@@ -3291,11 +4424,11 @@ if( !function_exists('calculate_reservation_cost_nightly') ) {
 }
 
 if( !function_exists('calculate_reservation_cost_day_date') ) {
-    function calculate_reservation_cost_day_date($reservation_id, $userID, $collapse = false) {
+    function calculate_reservation_cost_day_date($reservation_id, $userID, $collapse = true) {
         $prefix = 'homey_';
         $local = homey_get_localization();
         $allowded_html = array();
-        $output = '';
+        $output =array();
 
         if(empty($reservation_id)) {
             return;
@@ -3382,82 +4515,74 @@ if( !function_exists('calculate_reservation_cost_day_date') ) {
             $upfront_payment = $total_price;
             $balance = 0;
         }
-
-        $start_div = '<div class="payment-list">';
-
         if($collapse) {
-            $output = '<div class="payment-list-price-detail clearfix">';
-            $output .= '<div class="pull-left">';
-            $output .= '<div class="payment-list-price-detail-total-price">'.$local['cs_total'].'</div>';
-            $output .= '<div class="payment-list-price-detail-note">'.$local['cs_tax_fees'].'</div>';
-            $output .= '</div>';
-
-            $output .= '<div class="pull-right text-right">';
-            $output .= '<div class="payment-list-price-detail-total-price">'.homey_formatted_price($total_price).'</div>';
-            $output .= '<a class="payment-list-detail-btn" data-toggle="collapse" data-target=".collapseExample" href="javascript:void(0);" aria-expanded="false" aria-controls="collapseExample">'.$local['cs_view_details'].'</a>';
-            $output .= '</div>';
-            $output .= '</div>';
-
-            $start_div  = '<div class="collapse collapseExample" id="collapseExample">';
+            $output['cs_total'] = $local['cs_total'];
+            $output['cs_total']= $local['cs_tax_fees'];
+            $output['cs_total'] = homey_formatted_price($total_price);
         }
 
-
-        $output .= $start_div;
-        $output .= '<ul>';
-
         if($booking_has_custom_pricing == 1 && $booking_has_weekend == 1) {
-            $output .= '<li>'.$no_of_days.' '.$night_label.' ('.$local['with_custom_period_and_weekend_label'].') <span>'.$days_total_price.'</span></li>';
+            $output['no_of_days']= $no_of_days;
+            $output['night_label']=$night_label;
+            $output['nights_total_price']= $days_total_price;
 
         } elseif($booking_has_weekend == 1) {
-            $output .= '<li>'.$no_of_days.' '.$night_label.' ('.$with_weekend_label.') <span>'.$days_total_price.'</span></li>';
+            $output['no_of_days']= $no_of_days;
+            $output['night_label']=$night_label;
+            $output['nights_total_price']= $days_total_price;
 
         } elseif($booking_has_custom_pricing == 1) {
-            $output .= '<li>'.$no_of_days.' '.$night_label.' ('.$local['with_custom_period_label'].') <span>'.$days_total_price.'</span></li>';
+            $output['no_of_days']= $no_of_days;
+            $output['night_label']=$night_label;
+            $output['nights_total_price']= $days_total_price;
 
         } else {
-            $output .= '<li>'.$price_per_day_date.' x '.$no_of_days.' '.$night_label.' <span>'.$days_total_price.'</span></li>';
+            $output['no_of_days']= $no_of_days;
+            $output['night_label']=$night_label;
+            $output['price_per_night']=$price_per_day_date;
+            $output['nights_total_price']= $days_total_price;
         }
 
         if(!empty($additional_guests)) {
-            $output .= '<li>'.$additional_guests.' '.$add_guest_label.' <span>'.homey_formatted_price($additional_guests_total_price).'</span></li>';
+            $output['additional_guests']= $additional_guests.' '.$add_guest_label.' '.homey_formatted_price($additional_guests_total_price);
         }
 
         if(isset($reservation_meta['cleaning_fee'])){
             if(!empty($reservation_meta['cleaning_fee']) && $reservation_meta['cleaning_fee'] != 0) {
-                $output .= '<li>'.$local['cs_cleaning_fee'].' <span>'.$cleaning_fee.'</span></li>';
+            $output['cleaning_fee']= $local['cs_cleaning_fee'].' '.$cleaning_fee;
             }
         }
 
         if(!empty($extra_prices)) {
-            $output .= $extra_prices['extra_html'];
+            $output['extra_html']= $extra_prices['extra_html'];
         }
 
         if(isset($reservation_meta['city_fee'])){
             if(!empty($reservation_meta['city_fee']) && $reservation_meta['city_fee'] != 0) {
-                $output .= '<li>'.$local['cs_city_fee'].' <span>'.$city_fee.'</span></li>';
+            $output['city_fee']= $local['cs_city_fee'].' '.$city_fee;
             }
         }
 
         if(!empty($security_deposit) && $security_deposit != 0) {
-            $output .= '<li>'.$local['cs_sec_deposit'].' <span>'.homey_formatted_price($security_deposit).'</span></li>';
+            $output['security_deposit']= $local['cs_sec_deposit'].' '.homey_formatted_price($security_deposit);
         }
 
 
         if(!empty($services_fee) && !$is_host) {
-            $output .= '<li>'.$local['cs_services_fee'].' <span>'.homey_formatted_price($services_fee).'</span></li>';
+            $output['services_fee']= homey_formatted_price($services_fee);
         }
 
         if(!empty($extra_expenses)) {
-            $output .= $extra_expenses['expenses_html'];
+            $output['expenses_html']= $extra_expenses['expenses_html'];
         }
 
         if(!empty($extra_discount)) {
-            $output .= $extra_discount['discount_html'];
+            $output['discount_html']= $extra_discount['discount_html'];
         }
 
 
         if(!empty($taxes) && $taxes != 0 ) {
-            $output .= '<li>'.$local['cs_taxes'].' '.$taxes_percent.'% <span>'.homey_formatted_price($taxes).'</span></li>';
+            $output['taxes_percent']= $local['cs_taxes'].' '.$taxes_percent.'% '.homey_formatted_price($taxes);
         }
 
         if(homey_option('reservation_payment') == 'full') {
@@ -3465,156 +4590,225 @@ if( !function_exists('calculate_reservation_cost_day_date') ) {
             if($is_host && !empty($services_fee)) {
                 $upfront_payment = $upfront_payment - $services_fee;
             }
-            $output .= '<li class="payment-due">'.$local['inv_total'].' <span>'.homey_formatted_price($upfront_payment).'</span></li>';
-            $output .= '<input type="hidden" name="is_valid_upfront_payment" id="is_valid_upfront_payment" value="'.$upfront_payment.'">';
+            $output['upfront_price']=homey_formatted_price($upfront_payment);
 
         } else {
             if(!empty($upfront_payment) && $upfront_payment != 0) {
                 if($is_host && !empty($services_fee)) {
                     $upfront_payment = $upfront_payment - $services_fee;
                 }
-                $output .= '<li class="payment-due">'.$local['cs_payment_due'].' <span>'.homey_formatted_price($upfront_payment).'</span></li>';
-                $output .= '<input type="hidden" name="is_valid_upfront_payment" id="is_valid_upfront_payment" value="'.$upfront_payment.'">';
+                $output['upfront_price']= homey_formatted_price($upfront_payment);
             }
         }
 
         if(!empty($balance) && $balance != 0) {
-            $output .= '<li><i class="fa fa-info-circle"></i> '.$local['cs_pay_rest_1'].' '.homey_formatted_price($balance).' '.$local['cs_pay_rest_2'].'</li>';
+            $output['balance']=homey_formatted_price($balance);
         }
-
-
-        $output .= '</ul>';
-        $output .= '</div>';
-
         return $output;
     }
 }
 
-if( !function_exists('api_get_author_by_id') ) {
-    function api_get_author_by_id($w = '36', $h = '36', $classes = 'img-responsive img-circle', $ID) {
-        
-        global $homey_local;
-        $author = array();
+
+if( !function_exists('calculate_hourly_cost_for_wallet') ) {
+    function calculate_hourly_cost_for_wallet($reservation_id) {
         $prefix = 'homey_';
-        $comma = ' ';
-        $maximumPoints = 100;
-        $point = 0;
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = '';
 
-        $author['is_photo'] = false;
-        $author['is_email'] = false;
+        if(empty($reservation_id)) {
+            return;
+        }
+        $reservation_meta = get_post_meta($reservation_id, 'reservation_meta', true);
 
-        $custom_img = get_template_directory_uri().'/images/avatar.png';
+        $listing_id     = intval($reservation_meta['listing_id']);
+        $check_in_date  = wp_kses ( $reservation_meta['check_in_date'], $allowded_html );
+        $check_in_hour = wp_kses ( $reservation_meta['check_in_hour'], $allowded_html );
+        $check_out_hour = wp_kses ( $reservation_meta['check_out_hour'], $allowded_html );
+        $guests         = intval($reservation_meta['guests']);
+    
+        
+        $price_per_hour = homey_formatted_price($reservation_meta['price_per_hour'], true);
+        $no_of_hours = $reservation_meta['no_of_hours'];
+        $hours_total_price = homey_formatted_price($reservation_meta['hours_total_price'], false);
 
-        $author_picture_id = get_the_author_meta( 'homey_author_picture_id' , $ID );
+        $cleaning_fee = homey_formatted_price($reservation_meta['cleaning_fee']);
+        $services_fee = $reservation_meta['services_fee'];
+        $taxes = $reservation_meta['taxes'];
+        $taxes_percent = $reservation_meta['taxes_percent'];
+        $city_fee = homey_formatted_price($reservation_meta['city_fee']);
+        $security_deposit = $reservation_meta['security_deposit'];
+        $additional_guests = $reservation_meta['additional_guests'];
+        $additional_guests_price = $reservation_meta['additional_guests_price'];
+        $additional_guests_total_price = $reservation_meta['additional_guests_total_price'];
 
-        $doc_verified = get_the_author_meta( 'doc_verified' , $ID);
-        $author[ 'id' ] = $ID;
-        $author[ 'name' ] = get_the_author_meta( 'display_name' , $ID );
-        $author[ 'email' ] = get_the_author_meta( 'email', $ID );
-        $author[ 'bio' ] = get_the_author_meta( 'description' , $ID );
+        $upfront_payment = $reservation_meta['upfront'];
+        $balance = $reservation_meta['balance'];
+        $total_price = $reservation_meta['total'];
 
-        if( !empty( $author_picture_id ) ) {
-            $point+=30;
+        $booking_has_weekend = $reservation_meta['booking_has_weekend'];
+        $booking_has_custom_pricing = $reservation_meta['booking_has_custom_pricing'];
+        $with_weekend_label = $local['with_weekend_label'];
 
-            $author_picture_id = intval( $author_picture_id );
-            if ( $author_picture_id ) {
-
-                $photo = wp_get_attachment_url( $author_picture_id);
-                
-                if(!empty($photo)) {
-                    $author[ 'photo' ] = $photo;
-                } else {
-                    $author[ 'photo' ] = esc_url($custom_img);
-                }
-
-                $author['is_photo'] = true;
-            }
+        if($no_of_hours > 1) {
+            $hour_label = $local['hours_label'];
         } else {
-            $author[ 'photo' ] = esc_url($custom_img);
+            $hour_label = $local['hour_label'];
         }
 
-        //counting listings with statues
-       // $author[ 'all_listing_count' ]          = homey_hm_user_listing_count($ID);
-        //$author[ 'publish_listing_count' ]      = homey_hm_user_publish_listing_count($ID);
-       // $author[ 'all_featured_listing_count' ] = homey_featured_listing_count($ID);
-
-        $native_language  = get_the_author_meta( $prefix.'native_language' , $ID );
-        $other_language  =  get_the_author_meta( $prefix.'other_language' , $ID );
-        if(!empty($other_language) && !empty($native_language)) {
-            $comma = ', ';
+        if($additional_guests > 1) {
+            $add_guest_label = $local['cs_add_guests'];
+        } else {
+            $add_guest_label = $local['cs_add_guest'];
         }
 
-        $author['facebook']     =  get_the_author_meta( 'homey_author_facebook' , $ID );
-        $author['twitter']      =  get_the_author_meta( 'homey_author_twitter' , $ID );
-        $author['linkedin']     =  get_the_author_meta( 'homey_author_linkedin' , $ID );
-        $author['pinterest']    =  get_the_author_meta( 'homey_author_pinterest' , $ID );
-        $author['instagram']    =  get_the_author_meta( 'homey_author_instagram' , $ID );
-        $author['googleplus']   =  get_the_author_meta( 'homey_author_googleplus' , $ID );
-        $author['youtube']      =  get_the_author_meta( 'homey_author_youtube' , $ID );
-        $author['vimeo']        =  get_the_author_meta( 'homey_author_vimeo' , $ID );
-        $author[ 'link' ] = get_author_posts_url( $ID );
-        $author[ 'address' ] = get_the_author_meta( $prefix.'street_address' , $ID );
-        $author[ 'country' ] = get_the_author_meta( $prefix.'country' , $ID);
-        $author[ 'state' ] = get_the_author_meta( $prefix.'state' , $ID);
-        $author[ 'city' ] = get_the_author_meta( $prefix.'city' , $ID);
-        $author[ 'area' ] = get_the_author_meta( $prefix.'area' , $ID);
-        $author[ 'is_superhost' ] = get_the_author_meta( 'is_superhost' , $ID);
-        $author[ 'doc_verified' ] = $doc_verified;
-        $author[ 'user_document_id' ] = get_the_author_meta( 'homey_user_document_id' , $ID );
-        $author[ 'doc_verified_request' ] = get_the_author_meta( 'id_doc_verified_request' , $ID );
-        $author[ 'native_language' ] = $native_language;
-        $author[ 'other_language' ] = $other_language;
-        $author[ 'total_earnings' ] = homey_get_host_total_earnings($ID);
-        $author[ 'available_balance' ] = homey_get_host_available_earnings($ID);
-        $author[ 'languages' ] = esc_attr($native_language.$comma.$other_language);
+        
 
-        // Emergency Contact 
-        $author[ 'em_contact_name' ] = get_the_author_meta( $prefix.'em_contact_name' , $ID);
-        $author[ 'em_relationship' ] = get_the_author_meta( $prefix.'em_relationship' , $ID);
-        $author[ 'em_email' ] = get_the_author_meta( $prefix.'em_email' , $ID);
-        $author[ 'em_phone' ] = get_the_author_meta( $prefix.'em_phone' , $ID);
+        $output =array();
+            
+        if($booking_has_custom_pricing == 1 && $booking_has_weekend == 1) { 
+            $output ['price_pr']= $no_of_hours.' '.$hour_label.' ('.$local['with_custom_period_and_weekend_label'].') '.$hours_total_price;
+            
+        } elseif($booking_has_weekend == 1) {
+            $output ['price_pr']= esc_attr($price_per_hour).' x '.$no_of_hours.' '.$hour_label.' ('.$with_weekend_label.')'.$hours_total_price;
 
-        $author[ 'payout_payment_method' ] = get_the_author_meta( 'payout_payment_method' , $ID);
-        $author[ 'payout_paypal_email' ] = get_the_author_meta( 'payout_paypal_email' , $ID);
-        $author[ 'payout_skrill_email' ] = get_the_author_meta( 'payout_skrill_email' , $ID);
+        } elseif($booking_has_custom_pricing == 1) { 
+            $output ['price_pr']= $no_of_hours.' '.$hour_label.' ('.$local['with_custom_period_label'].') '.$hours_total_price;
 
-        // Beneficiary Information
-        $author[ 'ben_first_name' ] = get_the_author_meta( 'ben_first_name' , $ID);
-        $author[ 'ben_last_name' ] = get_the_author_meta( 'ben_last_name' , $ID);
-        $author[ 'ben_company_name' ] = get_the_author_meta( 'ben_company_name' , $ID);
-        $author[ 'ben_tax_number' ] = get_the_author_meta( 'ben_tax_number' , $ID);
-        $author[ 'ben_street_address' ] = get_the_author_meta( 'ben_street_address' , $ID);
-        $author[ 'ben_apt_suit' ] = get_the_author_meta( 'ben_apt_suit' , $ID);
-        $author[ 'ben_city' ] = get_the_author_meta( 'ben_city' , $ID);
-        $author[ 'ben_state' ] = get_the_author_meta( 'ben_state' , $ID);
-        $author[ 'ben_zip_code' ] = get_the_author_meta( 'ben_zip_code' , $ID);
-
-        //Wire Transfer Information
-        $author[ 'bank_account' ] = get_the_author_meta( 'bank_account' , $ID);
-        $author[ 'swift' ] = get_the_author_meta( 'swift' , $ID);
-        $author[ 'bank_name' ] = get_the_author_meta( 'bank_name' , $ID);
-        $author[ 'wir_street_address' ] = get_the_author_meta( 'wir_street_address' , $ID);
-        $author[ 'wir_aptsuit' ] = get_the_author_meta( 'wir_aptsuit' , $ID);
-        $author[ 'wir_city' ] = get_the_author_meta( 'wir_city' , $ID);
-        $author[ 'wir_state' ] = get_the_author_meta( 'wir_state' , $ID);
-        $author[ 'wir_zip_code' ] = get_the_author_meta( 'wir_zip_code' , $ID);
-
-
-        if(!empty($author[ 'email' ])) {
-            $point+=30;
-
-            $author['is_email'] = true;
+        } else {
+            $output ['price_pr']=$price_per_hour.' x '.$no_of_hours.' '.$hour_label.' '.$hours_total_price;
         }
 
-        if($doc_verified) {
-            $point+=40;
+        if(!empty($additional_guests)) {
+            $output ['additional_guests']= $additional_guests.' '.$add_guest_label.' '.homey_formatted_price($additional_guests_total_price);
+        }
+        
+        if(!empty($reservation_meta['cleaning_fee']) && $reservation_meta['cleaning_fee'] != 0) {
+            $output ['cleaning_fee']= $local['cs_cleaning_fee'].' '.$cleaning_fee;
         }
 
-        $percentage = ($point*$maximumPoints)/100;
-        $author[ 'profile_status' ] = $percentage."%";
-        $author[ 'is_email_verified' ] = get_the_author_meta( 'is_email_verified', $ID );
+        if(!empty($reservation_meta['city_fee']) && $reservation_meta['city_fee'] != 0) {
+            $output ['city_fee']= $local['cs_city_fee'].' '.$city_fee;
+        }
 
-        return $author;
+        if(!empty($security_deposit) && $security_deposit != 0) {
+            $output ['security_deposit']= $local['cs_sec_deposit'].' '.homey_formatted_price($security_deposit);
+        }
+        
+        if(!empty($services_fee) && $services_fee != 0 ) {
+            $output ['services_fee']= $local['cs_services_fee'].' '.homey_formatted_price($services_fee);
+        }
+
+        if(!empty($taxes) && $taxes != 0 ) {
+            $output ['taxes']= $local['cs_taxes'].' '.$taxes_percent.'% '.homey_formatted_price($taxes);
+        }
+
+        return $output;
+    } 
+}
+
+if( !function_exists('calculate_cost_for_wallet') ) {
+    function calculate_cost_for_wallet($reservation_id) {
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = '';
+        
+        if(empty($reservation_id)) {
+            return;
+        }
+        
+
+        $reservation_meta = get_post_meta($reservation_id, 'reservation_meta', true);
+        $listing_id     = intval($reservation_meta['listing_id']);
+        $booking_type = homey_booking_type_by_id($listing_id);
+        
+        return calculate_cost_for_my_wallet($reservation_id,$booking_type);
+
     }
 }
+
+if( !function_exists('calculate_cost_for_my_wallet') ) {
+    function calculate_cost_for_my_wallet($reservation_id,$booking_type) {
+        $prefix = 'homey_';
+        $local = homey_get_localization();
+        $allowded_html = array();
+        $output = array();
+        
+        if(empty($reservation_id)) {
+            return;
+        }
+        $reservation_meta = get_post_meta($reservation_id, 'reservation_meta', true);
+        $no_of_weeks= '';
+        $listing_id     = intval($reservation_meta['listing_id']);
+        $check_in_date  = wp_kses ( $reservation_meta['check_in_date'], $allowded_html );
+        $check_out_date = wp_kses ( $reservation_meta['check_out_date'], $allowded_html );
+        $guests         = intval($reservation_meta['guests']);
+        
+        if( $booking_type == 'per_week' ) {
+            $output ['price_per']  = homey_formatted_price($reservation_meta['price_per_week'], true);
+            $output ['no_of_days'] = $reservation_meta['no_of_days'];
+            $output ['total_count'] = $reservation_meta['total_weeks_count'];
+            $output ['price_count'] = homey_formatted_price($reservation_meta['weeks_total_price'], false);
+            $no_of_weeks= $reservation_meta['total_weeks_count'];
+        } else if( $booking_type == 'per_month' ) {
+            $output ['price_per'] = homey_formatted_price($reservation_meta['price_per_month'], true);
+            $output ['no_of_days'] = $reservation_meta['no_of_days'];
+            $output ['total_count'] = $reservation_meta['total_months_count'];
+            $output ['price_count'] = homey_formatted_price($reservation_meta['months_total_price'], false);
+        } else if( $booking_type == 'per_day_date' ) {
+            $output ['price_per'] = homey_formatted_price($reservation_meta['price_per_day_date'], true);
+            $output ['no_of_days'] = $reservation_meta['no_of_days'];
+            $output ['price_count'] = homey_formatted_price($reservation_meta['days_total_price'], false);
+        } else {
+            $output ['price_per']  = homey_formatted_price($reservation_meta['price_per_night'], true);
+            $output ['no_of_days'] = $reservation_meta['no_of_days'];
+            
+            $output ['price_count'] = homey_formatted_price($reservation_meta['nights_total_price'], false);
+            
+        }
+        $no_of_days= $reservation_meta['no_of_days'];
+        
+        $additional_guests= $reservation_meta['additional_guests'];
+
+        $output ['cleaning_fee'] = homey_formatted_price($reservation_meta['cleaning_fee']);
+        $output ['services_fee'] =homey_formatted_price($reservation_meta['services_fee']); 
+        $output ['taxes'] = homey_formatted_price($reservation_meta['taxes']); 
+        $output ['taxes_percent'] = $reservation_meta['taxes_percent'];
+        $output ['city_fee'] = homey_formatted_price($reservation_meta['city_fee']);
+        $output ['security_deposit'] = homey_formatted_price($reservation_meta['security_deposit']); 
+        $output ['additional_guests'] = $reservation_meta['additional_guests'];
+        $output ['additional_guests_price'] = homey_formatted_price($reservation_meta['additional_guests_price']); 
+        $output ['additional_guests_total_price'] =homey_formatted_price($reservation_meta['additional_guests_total_price']);
+
+        $output ['upfront_payment'] = homey_formatted_price($reservation_meta['upfront']); 
+        $output ['balance'] = homey_formatted_price($reservation_meta['balance']); 
+        $output ['total_price'] =homey_formatted_price($reservation_meta['total']); 
+
+        $output ['booking_has_weekend'] = $reservation_meta['booking_has_weekend'];
+        $output ['booking_has_custom_pricing'] =homey_formatted_price($reservation_meta['booking_has_custom_pricing']); 
+        $with_weekend_label = $local['with_weekend_label'];
+
+        if($no_of_days > 1) {
+            $output ['night_label']  = homey_option('glc_day_nights_label');
+        } else {
+            $output ['night_label']  = homey_option('glc_day_night_label');
+        }
+
+        if($no_of_weeks > 1) {
+            $output ['week_label'] = homey_option('glc_weeks_label');
+        } else {
+            $output ['week_label'] = homey_option('glc_week_label');
+        }
+
+        if($additional_guests > 1) {
+            $output ['add_guest_label'] = $local['cs_add_guests'];
+        } else {
+            $output ['add_guest_label'] = $local['cs_add_guest'];
+        }
+        return $output;
+    } 
+}
+
+
 ?>

@@ -239,7 +239,9 @@ if( !function_exists('homey_add_reservation') ) {
 
             $pending_dates_array = homey_get_booking_pending_days($listing_id);
             update_post_meta($listing_id, 'reservation_pending_dates', $pending_dates_array);
-
+                
+                send_push_notification($listing_owner_id,$local['request_sent']);
+                
             echo json_encode(
                 array(
                     'success' => true,
@@ -421,7 +423,9 @@ if( !function_exists('homey_add_instance_booking') ) {
         //Book dates
         $booked_days_array = homey_make_days_booked($listing_id, $reservation_id);
         update_post_meta($listing_id, 'reservation_dates', $booked_days_array);
-
+        
+            send_push_notification($listing_owner_id,$renter_message);
+            
         do_action('homey_create_messages_thread', $renter_message, $reservation_id, $user_id);
 
         return $reservation_id;
@@ -7947,20 +7951,3 @@ if(!function_exists('homey_remove_discount')) {
         return $reservation_unavailable_array;
     }
 }*/
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

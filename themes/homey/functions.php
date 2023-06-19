@@ -929,3 +929,27 @@ if ( !function_exists( 'dd' ) ) {
         exit;
     }
 }
+
+
+function send_push_notification($user_id, $message) {
+    $onesignal_app_id = 'c2f14044-e7fa-4539-a9af-0ee512982239';
+    $onesignal_rest_api_key = 'ZTNjNTRlNzctOTg1Zi00ZWY4LTgyMTgtN2JkMTUyOGVmN2I0';
+    
+    $fields = array(
+        'app_id' => $onesignal_app_id,
+        'include_player_ids' => array($user_id),
+        'contents' => array('en' => $message),
+    );
+    
+    $headers = array(
+        'Authorization' => 'Basic ' . $onesignal_rest_api_key,
+    );
+    
+    $response = wp_remote_post('https://onesignal.com/api/v1/notifications', array(
+        'method' => 'POST',
+        'headers' => $headers,
+        'body' => $fields,
+    ));
+    
+    // Handle the response if needed
+}

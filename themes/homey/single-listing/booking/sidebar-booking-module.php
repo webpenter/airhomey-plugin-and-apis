@@ -103,7 +103,7 @@ $no_login_needed_for_booking = homey_option('no_login_needed_for_booking');
 					<input type="hidden" name="listing_id" id="listing_id" value="<?php echo intval($listing_id); ?>">
 					<input type="hidden" name="reservation-security" id="reservation-security" value="<?php echo wp_create_nonce('reservation-security-nonce'); ?>"/>
 					
-					<?php if($instant_booking && $offsite_payment == 0 ) { ?>
+					<?php var_dump($instant_booking && $offsite_payment==0 ); if($instant_booking && $offsite_payment == 0 ) { ?>
 						<button id="instance_reservation" type="button" class="btn btn-full-width btn-primary"><?php echo esc_html__('Instant Booking', 'homey'); ?></button>
 					<?php } else { ?>
                         <?php if(!is_user_logged_in() && $no_login_needed_for_booking == 'yes'){ ?>
